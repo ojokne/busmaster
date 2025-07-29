@@ -13,5 +13,5 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-  ]
+, "tests/unit/HomeScreen.test.js", "app/_layout.jsx", "app/index.jsx"  ]
 }
