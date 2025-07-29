@@ -10,7 +10,8 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "lint:fix": "expo lint --fix",
-    "test": "jest"
+    "test": "jest",
+    "build:preview":"eas build --platform android --profile preview --local"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
