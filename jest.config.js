@@ -15,7 +15,7 @@ module.exports = {
       'firebase|' + // include firebase package
       '@firebase|' + // include firebase's sub-packages
       '@react-native-async-storage/async-storage' +
-    ')',
+      ')',
   ],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1', // for @ alias support

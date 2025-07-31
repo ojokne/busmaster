@@ -17,9 +17,9 @@ import { auth } from '@/config/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'expo-router';
 
-const SigninScreen = () => {
+const SigninScreen = ({ onLogin }) => {
   const router = useRouter();
-  const [Email, setEmail] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -28,7 +28,7 @@ const SigninScreen = () => {
   const handleLogin = async () => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!regex.test(Email)) {
+    if (!regex.test(email)) {
       setError('Invalid email address');
       return;
     }
@@ -38,9 +38,13 @@ const SigninScreen = () => {
       return;
     }
 
+    if (onLogin) {
+      return onLogin(email, password);
+    }
+
     try {
       setIsLoading(true);
-      await signInWithEmailAndPassword(auth, Email, password);
+      await signInWithEmailAndPassword(auth, email, password);
       router.replace('/(tabs)');
       setError('');
     } catch (e) {
@@ -94,9 +98,10 @@ const SigninScreen = () => {
             style={styles.input}
             placeholder="Email"
             keyboardType="email-address"
-            value={Email}
+            value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
+            testID="email"
           />
 
           <Text style={styles.label}>Password</Text>
@@ -109,8 +114,10 @@ const SigninScreen = () => {
               value={password}
               onChangeText={setPassword}
               autoCapitalize="none"
+              testID="password"
             />
             <Pressable
+              testID="showPassword"
               onPress={() => setShowPassword((prev) => !prev)}
               style={styles.showPasswordBtn}>
               <Feather name={showPassword ? 'eye-off' : 'eye'} color="#888" size={24} />
@@ -119,11 +126,14 @@ const SigninScreen = () => {
 
           {error ? <Text style={styles.error}>{error}</Text> : null}
 
-          <Pressable style={styles.button} onPress={handleLogin}>
-            <Text style={styles.buttonText}>{isLoading ? 'Loading...' : 'Login'}</Text>
+          <Pressable style={styles.button} onPress={handleLogin} testID="signinButton">
+            <Text style={styles.buttonText}>{isLoading ? 'Signing in...' : 'Sign In'}</Text>
           </Pressable>
 
-          <Pressable style={styles.signupLink} onPress={() => router.push('/(tabs)')}>
+          <Pressable
+            style={styles.signupLink}
+            onPress={() => router.push('/(tabs)')}
+            testID="signupLink">
             <Text style={styles.signupText}>
               Don&apos;t have an account? <Text style={styles.signupLink}>Sign Up</Text>
             </Text>
