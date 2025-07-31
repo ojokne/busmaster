@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   TextInput,
@@ -14,7 +14,7 @@ import Colors from '../constants/colors';
 import { AntDesign, Feather } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { auth } from '@/config/firebase';
-import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'expo-router';
 
 const SigninScreen = () => {
@@ -73,15 +73,6 @@ const SigninScreen = () => {
       }
     }
   };
-
-  // useEffect(() => {
-  //   const unsubscribe = onAuthStateChanged(auth, (user) => {
-  //     if (user) {
-  //       router.replace('/(tabs)');
-  //     }
-  //   });
-  //   return unsubscribe;
-  // }, []);
 
   return (
     <KeyboardAvoidingView
