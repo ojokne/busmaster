@@ -1,50 +1,43 @@
 appId: com.oen.busmaster
 ---
-name: Sign In - Valid Credentials
-steps:
-  - launchApp
-  - tapOn:
-      id: email
-  - inputText: test@example.com
-  - tapOn:
-      id: password
-  - inputText: password123
-  - tapOn:
-      id: showPassword
-  - tapOn:
-      id: signinButton
-  - assertVisible:
-      text: Signing in...
-  - waitForTimeout: 2000
 
----
-name: Sign In - Invalid Email Format
-steps:
-  - launchApp
-  - tapOn:
-      id: email
-  - inputText: invalid-email
-  - tapOn:
-      id: password
-  - inputText: password123
-  - tapOn:
-      id: signinButton
-  - assertVisible:
-      text: Invalid email address
-  - waitForTimeout: 1000
+# Test 1: Invalid Email Format
+- launchApp
+- tapOn:
+    id: email
+- inputText: invalid-email
+- tapOn:
+    id: password
+- inputText: password123
+- tapOn:
+    id: signinButton
+- assertVisible:
+    text: Invalid email address
 
----
-name: Sign In - Short Password
-steps:
-  - launchApp
-  - tapOn:
-      id: email
-  - inputText: test@example.com
-  - tapOn:
-      id: password
-  - inputText: 123
-  - tapOn:
-      id: signinButton
-  - assertVisible:
-      text: Password must be at least 6 characters.
-  - waitForTimeout: 1000
+# Test 2: Short Password
+- launchApp
+- tapOn:
+    id: email
+- inputText: test@example.com
+- tapOn:
+    id: password
+- inputText: 123
+- tapOn:
+    id: signinButton
+- assertVisible:
+    text: Password must be at least 6 characters.
+
+# Test 3: Valid Sign In
+- launchApp
+- tapOn:
+    id: 'email'
+- inputText: 'test@example.com'
+- tapOn:
+    id: 'password'
+- inputText: 'password123'
+- tapOn:
+    id: 'showPassword'
+- tapOn:
+    id: 'signinButton'
+- assertVisible:
+    text: 'Signing in...'

@@ -102,6 +102,7 @@ const SigninScreen = ({ onLogin }) => {
             onChangeText={setEmail}
             autoCapitalize="none"
             testID="email"
+            placeholderTextColor={Colors.textMuted}
           />
 
           <Text style={styles.label}>Password</Text>
@@ -115,6 +116,8 @@ const SigninScreen = ({ onLogin }) => {
               onChangeText={setPassword}
               autoCapitalize="none"
               testID="password"
+              placeholderTextColor={Colors.textMuted}
+              co
             />
             <Pressable
               testID="showPassword"
@@ -184,9 +187,11 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     paddingHorizontal: 14,
     paddingVertical: 5,
+    color: Colors.textSecondary,
   },
   inputWithIcon: {
     flex: 1,
+    color: Colors.textSecondary,
   },
   showPasswordBtn: {
     padding: 4,
