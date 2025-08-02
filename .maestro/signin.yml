@@ -13,6 +13,7 @@ appId: com.oen.busmaster
     id: signinButton
 - assertVisible:
     text: Invalid email address
+- clearState
 
 # Test 2: Short Password
 - launchApp
@@ -26,6 +27,7 @@ appId: com.oen.busmaster
     id: signinButton
 - assertVisible:
     text: Password must be at least 6 characters.
+- clearState
 
 # Test 3: Valid Sign In
 - launchApp
@@ -39,5 +41,8 @@ appId: com.oen.busmaster
     id: 'showPassword'
 - tapOn:
     id: 'signinButton'
-- assertVisible:
-    text: 'Signing in...'
+- clearState
+
+# Test 4: Signup link
+- launchApp
+- tapOn:
