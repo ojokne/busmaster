@@ -1,0 +1,50 @@
+appId: com.oen.busmaster
+---
+
+# Test 1: Invalid Email Format
+- launchApp
+- tapOn:
+    id: email
+- inputText: invalid-email
+- tapOn:
+    id: password
+- inputText: password123
+- tapOn:
+    id: signinButton
+- assertVisible:
+    text: Invalid email address
+- clearState
+
+# Test 2: Short Password
+- launchApp
+- tapOn:
+    id: email
+- inputText: test@example.com
+- tapOn:
+    id: password
+- inputText: 123
+- tapOn:
+    id: signinButton
+- assertVisible:
+    text: Password must be at least 6 characters.
+- clearState
+
+# Test 3: Valid Sign In
+- launchApp
+- tapOn:
+    id: 'email'
+- inputText: 'test@example.com'
+- tapOn:
+    id: 'password'
+- inputText: 'password123'
+- tapOn:
+    id: 'showPassword'
+- tapOn:
+    id: 'signinButton'
+- clearState
+
+# Test 4: Signup link
+- launchApp
+- tapOn: 
+    id: 'signupLink'
+- clearState

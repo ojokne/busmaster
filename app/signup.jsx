@@ -14,10 +14,10 @@ import Colors from '../constants/colors';
 import { AntDesign, Feather } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { auth } from '@/config/firebase';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'expo-router';
 
-const SigninScreen = ({ onLogin }) => {
+const SignupScreen = ({ onSignup }) => {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -25,7 +25,7 @@ const SigninScreen = ({ onLogin }) => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = async () => {
+  const handleSignup = async () => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!regex.test(email)) {
@@ -38,42 +38,37 @@ const SigninScreen = ({ onLogin }) => {
       return;
     }
 
-    if (onLogin) {
-      return onLogin(email, password);
+    if (onSignup) {
+      return onSignup(email, password);
     }
 
     try {
       setIsLoading(true);
-      await signInWithEmailAndPassword(auth, email, password);
-      router.replace('/(tabs)');
+      await createUserWithEmailAndPassword(auth, email, password);
       setError('');
+      router.replace('/(tabs)');
     } catch (e) {
       setIsLoading(false);
       let code = e.code;
       console.log(code);
       switch (code) {
+        case 'auth/email-already-in-use':
+          setError('Email is already in use.');
+          break;
         case 'auth/invalid-email':
-          setError('Invalid credentials.');
+          setError('Invalid email address.');
           break;
-        case 'auth/wrong-password':
-          setError('Invalid credentials.');
+        case 'auth/operation-not-allowed':
+          setError('Signup is not allowed at this time.');
           break;
-        case 'auth/user-not-found':
-          setError('Incorrect email or password.');
-          break;
-        case 'auth/invalid-credential':
-          setError('Invalid credentials.');
+        case 'auth/weak-password':
+          setError('Password is too weak.');
           break;
         case 'auth/network-request-failed':
-          setError('Network request failed. Please check your connection.');
-          break;
-        case 'auth/too-many-requests':
-          setError(
-            'Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or try again later.',
-          );
+          setError('Network error. Check your connection.');
           break;
         default:
-          setError('There was a problem with your request.');
+          setError('Something went wrong. Please try again.');
       }
     }
   };
@@ -87,9 +82,9 @@ const SigninScreen = ({ onLogin }) => {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
           <View style={styles.header}>
-            <AntDesign name="user" color={Colors.primary} size={60} />
-            <Text style={styles.title} testID="signin-header">
-              Sign In
+            <AntDesign name="adduser" color={Colors.primary} size={60} />
+            <Text style={styles.title} testID="signup-header">
+              Sign Up
             </Text>
           </View>
 
@@ -109,7 +104,7 @@ const SigninScreen = ({ onLogin }) => {
           <View style={styles.inputWithIconContainer}>
             <TextInput
               style={styles.inputWithIcon}
-              placeholder="Enter your password"
+              placeholder="Create a password"
               keyboardType="default"
               secureTextEntry={!showPassword}
               value={password}
@@ -117,10 +112,9 @@ const SigninScreen = ({ onLogin }) => {
               autoCapitalize="none"
               testID="password"
               placeholderTextColor={Colors.textMuted}
-              co
             />
             <Pressable
-              testID="showPassword"
+              testID="togglePassword"
               onPress={() => setShowPassword((prev) => !prev)}
               style={styles.showPasswordBtn}>
               <Feather name={showPassword ? 'eye-off' : 'eye'} color="#888" size={24} />
@@ -129,16 +123,16 @@ const SigninScreen = ({ onLogin }) => {
 
           {error ? <Text style={styles.error}>{error}</Text> : null}
 
-          <Pressable style={styles.button} onPress={handleLogin} testID="signinButton">
-            <Text style={styles.buttonText}>{isLoading ? 'Signing in...' : 'Sign In'}</Text>
+          <Pressable style={styles.button} onPress={handleSignup} testID="signupButton">
+            <Text style={styles.buttonText}>{isLoading ? 'Signing up...' : 'Sign Up'}</Text>
           </Pressable>
 
           <Pressable
-            style={styles.signupLink}
-            onPress={() => router.push('/signup')}
-            testID="signupLink">
-            <Text style={styles.signupText}>
-              Don&apos;t have an account? <Text style={styles.signupLink}>Sign Up</Text>
+            style={styles.signinLink}
+            onPress={() => router.push('/signin')}
+            testID="signinLink">
+            <Text style={styles.signinText}>
+              Already have an account? <Text style={styles.signupLink}>Sign In</Text>
             </Text>
           </Pressable>
         </View>
@@ -217,14 +211,18 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     fontSize: 15,
   },
-  signupLink: {
+  signinLink: {
     alignItems: 'center',
     marginTop: 8,
     color: Colors.primary,
   },
-  signupText: {
+  signinText: {
     fontSize: 15,
+  },
+  signupLink: {
+    color: Colors.primary,
+    fontWeight: 'bold',
   },
 });
 
-export default SigninScreen;
+export default SignupScreen;

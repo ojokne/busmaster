@@ -16,6 +16,7 @@ jest.mock('firebase/auth', () => ({
   })),
   signInWithEmailAndPassword: jest.fn(),
   onAuthStateChanged: jest.fn(),
+  createUserWithEmailAndPassword: jest.fn(() => Promise.resolve({ user: {} })),
 }));
 jest.mock('firebase/firestore', () => ({
   getFirestore: jest.fn(() => ({})),
