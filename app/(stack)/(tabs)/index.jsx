@@ -30,10 +30,14 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { Feather, FontAwesome5, FontAwesome } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import Colors from '../../../constants/colors';
+import CreateTripModal from '../../../components/CreateTripModal';
 
 const HomeScreen = () => {
   const [showRevenue, setShowRevenue] = useState(false);
   const router = useRouter();
+
+  const [showModal, setShowModal] = useState(false);
+  const companyId = 'example-company-id';
 
   const revenue = 154000;
   const ticketsSold = 327;
@@ -49,7 +53,7 @@ const HomeScreen = () => {
   const limitedTickets = recentTickets.slice(0, 3);
 
   const handleCreateTrip = () => {
-    router.push('/trips/create');
+    setShowModal(true);
   };
 
   const handleSellTicket = () => {
@@ -92,7 +96,6 @@ const HomeScreen = () => {
           </View>
         </View>
       </View>
-
       <View style={styles.body}>
         <Text style={styles.sectionTitle} testID="quick-actions-title">
           Quick Actions
@@ -133,6 +136,11 @@ const HomeScreen = () => {
           </View>
         ))}
       </View>
+      <CreateTripModal
+        visible={showModal}
+        onClose={() => setShowModal(false)}
+        companyId={companyId}
+      />
     </View>
   );
 };
@@ -140,12 +148,13 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.surface,
   },
   header: {
     backgroundColor: Colors.primary,
     paddingHorizontal: 20,
     paddingTop: 50,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
   },
   body: {
     paddingHorizontal: 20,
@@ -163,7 +172,7 @@ const styles = StyleSheet.create({
     marginBottom: 28,
   },
   card: {
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.white,
     flex: 1,
     padding: 16,
     marginRight: 12,
@@ -199,7 +208,7 @@ const styles = StyleSheet.create({
     marginBottom: 28,
   },
   actionCard: {
-    backgroundColor: '#fff',
+    backgroundColor: Colors.white,
     flex: 1,
     padding: 16,
     alignItems: 'center',
@@ -224,7 +233,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   ticketItem: {
-    backgroundColor: '#fff',
+    backgroundColor: Colors.white,
     padding: 14,
     borderRadius: 10,
     flexDirection: 'row',

@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
     flex: 1,
-    backgroundColor: '#f7f8fa',
+    backgroundColor: Colors.background,
     padding: 24,
   },
   header: {
@@ -166,15 +166,17 @@ const styles = StyleSheet.create({
     marginLeft: 2,
   },
   input: {
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.white,
     borderRadius: 8,
     paddingHorizontal: 14,
     paddingVertical: 12,
     marginBottom: 16,
     fontSize: 16,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   inputWithIconContainer: {
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.white,
     flexDirection: 'row',
     alignItems: 'center',
     borderRadius: 8,
@@ -182,6 +184,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 5,
     color: Colors.textSecondary,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   inputWithIcon: {
     flex: 1,

@@ -1,27 +1,25 @@
 const Colors = {
-  // === Brand Primary Colors ===
-  primary: '#276EF1', // Safety Blue (main brand color)
-  primaryDark: '#1A4FCC', // For pressed states, headers
-  primaryLight: '#E3ECFD', // For tints, focused inputs
+  primary: '#276EF1',
+  primaryDark: '#1A4FCC',
+  primaryLight: '#E3ECFD',
 
-  // === Backgrounds & Surfaces ===
-  background: '#FFFFFF', // Default background
-  surface: '#F5F5F7', // Cards, inputs, containers
-  border: '#E5E5EA', // Outlines, dividers
+  background: '#f7f8fa',
+  surface: '#F5F5F7',
+  border: '#E5E5EA',
+  white: '#FFFFFF',
 
-  // === Text Colors ===
-  textPrimary: '#1C1C1E', // Main text
-  textSecondary: '#3A3A3C', // Subheadings, labels
-  textMuted: '#6E6E73', // Hints, timestamps
-  textInverse: '#FFFFFF', // Text on blue or dark surfaces
+  textPrimary: '#1C1C1E',
+  textSecondary: '#3A3A3C',
+  textMuted: '#6E6E73',
+  textInverse: '#FFFFFF',
 
-  // === Status Colors ===
-  error: '#FF3B30', // Errors, invalid input
-  success: '#34C759', // Success, confirmations
-  warning: '#FF9500', // Warnings, attention
+  error: '#a00',
+  errorBackground: '#ffe6e6',
+  success: '#207520',
+  successBackground: '#e6ffe6',
+  warning: '#FF9500',
 
-  // === Additional (optional) ===
-  overlay: 'rgba(0,0,0,0.4)', // For modal backgrounds, etc.
+  overlay: 'rgba(0,0,0,0.4)',
 };
 
 export default Colors;
