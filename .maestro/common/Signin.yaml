@@ -1,0 +1,17 @@
+appId: com.oen.busmaster
+---
+
+- launchApp
+- clearState
+- launchApp
+- tapOn:
+    id: 'email'
+- inputText: 'test@example.com'
+- tapOn:
+    id: 'password'
+- inputText: 'password123'
+- tapOn:
+    id: 'showPassword'
+- tapOn:
+    id: 'signinButton'
+

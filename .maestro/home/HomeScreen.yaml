@@ -1,0 +1,21 @@
+appId: com.oen.busmaster
+---
+
+- runFlow: ../common/Signin.yaml 
+- assertVisible: "Bus Master"
+- assertVisible: "Total Revenue"
+- assertVisible: "Sell Ticket"
+- assertVisible: "Create Trip"
+- assertVisible: "Tickets Sold"
+- assertVisible: "Recent Tickets"
+
+- tapOn:
+    id: "ProfileTab"  
+- assertVisible: "All Profile"  
+- back
+
+- tapOn:
+    id: "sellTicketTab"  
+- assertVisible: "Sell ticket"  
+
+- clearState
