@@ -1,7 +1,6 @@
 appId: com.oen.busmaster
 ---
 
-- launchApp
 - clearState
 - launchApp
 - tapOn:
