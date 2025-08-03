@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, fireEvent, waitFor, screen } from '@testing-library/react-native';
 import { useRouter } from 'expo-router';
 import HomeScreen from '../../app/(stack)/(tabs)';
@@ -18,7 +17,7 @@ describe('HomeScreen', () => {
   test('toggles showRevenue state when eye icon is pressed', async () => {
     render(<HomeScreen />);
 
-    const toggleRevenueButton = screen.getByTestId('toggleRevenue');
+    const toggleRevenueButton = screen.getByTestId('toggle-revenue');
 
     await waitFor(() => screen.getByTestId('total-revenue'));
     expect(screen.getByTestId('total-revenue')).toHaveTextContent('••••••');
@@ -78,12 +77,13 @@ describe('HomeScreen', () => {
     expect(mockPush).toHaveBeenCalledWith('/sell-ticket');
   });
 
-  test('navigates to Create Trip screen when Create Trip button is pressed', () => {
+  test('navigates to Create Trip screen when Create Trip button is pressed', async () => {
     render(<HomeScreen />);
 
     const createTripButton = screen.getByTestId('create-trip');
     fireEvent.press(createTripButton);
-    expect(mockPush).toHaveBeenCalledWith('/trips/create');
+    await waitFor(() => screen.getByTestId('create-trip-modal'));
+    expect(screen.getByTestId('create-trip-modal')).toBeOnTheScreen();
   });
 
   test('navigates to All Tickets screen when See All is pressed', () => {

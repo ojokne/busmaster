@@ -77,7 +77,7 @@ const HomeScreen = () => {
               <Text style={styles.cardTitle} testID="revenue-card-title">
                 Total Revenue
               </Text>
-              <Pressable onPress={() => setShowRevenue((prev) => !prev)} testID="toggleRevenue">
+              <Pressable onPress={() => setShowRevenue((prev) => !prev)} testID="toggle-revenue">
                 <Feather name={showRevenue ? 'eye-off' : 'eye'} size={20} color="#555" />
               </Pressable>
             </View>
@@ -101,17 +101,13 @@ const HomeScreen = () => {
           Quick Actions
         </Text>
         <View style={styles.actionsContainer}>
-          <Pressable style={styles.actionCard} onPress={handleSellTicket}>
+          <Pressable style={styles.actionCard} onPress={handleSellTicket} testID="sell-ticket">
             <FontAwesome5 name="bus" size={24} color={Colors.primary} />
-            <Text style={styles.actionText} testID="sell-ticket">
-              Sell Ticket
-            </Text>
+            <Text style={styles.actionText}>Sell Ticket</Text>
           </Pressable>
-          <Pressable style={styles.actionCard} onPress={handleCreateTrip}>
+          <Pressable style={styles.actionCard} onPress={handleCreateTrip} testID="create-trip">
             <FontAwesome name="road" size={28} color={Colors.primary} />
-            <Text style={styles.actionText} testID="create-trip">
-              Create Trip
-            </Text>
+            <Text style={styles.actionText}>Create Trip</Text>
           </Pressable>
         </View>
 
@@ -119,10 +115,8 @@ const HomeScreen = () => {
           <Text style={styles.sectionTitle} testID="recent-tickets">
             Recent Tickets
           </Text>
-          <Pressable onPress={handleViewAllTickets}>
-            <Text style={styles.seeAllText} testID="all-tickets">
-              See All
-            </Text>
+          <Pressable onPress={handleViewAllTickets} testID="all-tickets">
+            <Text style={styles.seeAllText}>See All</Text>
           </Pressable>
         </View>
 

@@ -4,7 +4,6 @@ import {
   Text,
   TextInput,
   Modal,
-  TouchableOpacity,
   StyleSheet,
   Platform,
   Pressable,
@@ -70,7 +69,12 @@ const CreateTripModal = ({ visible, onClose, companyId }) => {
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent={true} onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent={true}
+      onRequestClose={onClose}
+      testID="create-trip-modal">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardAvoidingViewContainer}>
@@ -78,55 +82,75 @@ const CreateTripModal = ({ visible, onClose, companyId }) => {
           <View style={styles.backdrop}>
             <View style={styles.container}>
               <View style={styles.headerRow}>
-                <Text style={styles.title} testID="modalTitle">
+                <Text style={styles.title} testID="modal-title">
                   Create Trip
                 </Text>
-                <TouchableOpacity onPress={onClose}>
+                <Pressable onPress={onClose} testID="close-button">
                   <AntDesign name="close" size={24} color="black" />
-                </TouchableOpacity>
+                </Pressable>
               </View>
 
-              <TextInput
-                testID="inputFrom"
-                style={styles.input}
-                placeholder="From (Boarding Point)"
-                value={from}
-                onChangeText={setFrom}
-              />
+              <View>
+                <Text style={styles.label}>From (Boarding Point)</Text>
+                <TextInput
+                  testID="input-from"
+                  style={styles.input}
+                  placeholder="Kampala"
+                  value={from}
+                  onChangeText={setFrom}
+                  placeholderTextColor={Colors.textMuted}
+                />
+              </View>
 
-              <TextInput
-                testID="inputTo"
-                style={styles.input}
-                placeholder="To (Destination)"
-                value={to}
-                onChangeText={setTo}
-              />
+              <View>
+                <Text style={styles.label}>To (Destination)</Text>
+                <TextInput
+                  testID="input-to"
+                  style={styles.input}
+                  placeholder="Lira"
+                  value={to}
+                  onChange={setTo}
+                  placeholderTextColor={Colors.textMuted}
+                />
+              </View>
 
-              <TextInput
-                testID="inputBusReg"
-                style={styles.input}
-                placeholder="Bus Registration"
-                value={busReg}
-                onChangeText={setBusReg}
-              />
+              <View>
+                <Text style={styles.label}>Bus Registration</Text>
+                <TextInput
+                  testID="input-bus-reg"
+                  style={styles.input}
+                  placeholder="UAX123X"
+                  value={busReg}
+                  onChangeText={setBusReg}
+                  placeholderTextColor={Colors.textMuted}
+                />
+              </View>
 
-              <TouchableOpacity
-                testID="inputDate"
-                style={styles.datePicker}
-                onPress={() => setShowDatePicker(true)}>
-                <Text>{date.toDateString()}</Text>
-              </TouchableOpacity>
+              <View>
+                <Text style={styles.label}>Trip Date</Text>
+                <Pressable
+                  testID="input-date"
+                  style={styles.input}
+                  onPress={() => setShowDatePicker(true)}>
+                  <Text style={styles.dateTimePlaceholder}>{date.toDateString()}</Text>
+                </Pressable>
+              </View>
 
-              <TouchableOpacity
-                testID="inputTime"
-                style={styles.datePicker}
-                onPress={() => setShowTimePicker(true)}>
-                <Text>{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
-              </TouchableOpacity>
+              <View>
+                <Text style={styles.label}>Departure Time</Text>
+                <Pressable
+                  testID="input-time"
+                  style={styles.input}
+                  onPress={() => setShowTimePicker(true)}>
+                  <Text style={styles.dateTimePlaceholder}>
+                    {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </Text>
+                </Pressable>
+              </View>
 
               {showDatePicker && (
                 <DateTimePicker
-                  testID="dateTimePickerDate"
+                  testID="dateTime-picker-date"
                   value={date}
                   mode="date"
                   display={Platform.OS === 'ios' ? 'spinner' : 'default'}
@@ -139,7 +163,7 @@ const CreateTripModal = ({ visible, onClose, companyId }) => {
 
               {showTimePicker && (
                 <DateTimePicker
-                  testID="dateTimePickerTime"
+                  testID="dateTime-picker-time"
                   value={time}
                   mode="time"
                   display={Platform.OS === 'ios' ? 'spinner' : 'default'}
@@ -149,10 +173,9 @@ const CreateTripModal = ({ visible, onClose, companyId }) => {
                   }}
                 />
               )}
-
               {message && (
                 <Text
-                  testID="feedbackMessage"
+                  testID="feedback-message"
                   style={[
                     styles.feedback,
                     messageType === 'success' ? styles.success : styles.error,
@@ -161,7 +184,7 @@ const CreateTripModal = ({ visible, onClose, companyId }) => {
                 </Text>
               )}
 
-              <Pressable style={styles.button} onPress={handleSubmit} testID="submitButton">
+              <Pressable style={styles.button} onPress={handleSubmit} testID="submit-button">
                 <Text style={styles.buttonText}>
                   {isLoading ? 'Creating Trip...' : 'Create Trip'}
                 </Text>
@@ -189,7 +212,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     padding: 20,
     width: '100%',
-    height: '70%',
+    height: '90%',
     position: 'absolute',
     bottom: 0,
     left: 0,
@@ -205,9 +228,18 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
   },
+  label: {
+    fontSize: 14,
+    fontWeight: '500',
+    marginBottom: 6,
+    color: Colors.textMuted,
+  },
+  dateTimePlaceholder: {
+    color: Colors.textMuted,
+  },
   input: {
     backgroundColor: Colors.white,
-    borderRadius: 8,
+    borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 12,
     marginBottom: 16,
@@ -215,17 +247,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.border,
   },
-  datePicker: {
-    padding: 10,
-    backgroundColor: Colors.white,
-    borderRadius: 5,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
   feedback: {
     padding: 10,
-    borderRadius: 5,
+    borderRadius: 10,
     marginBottom: 10,
     textAlign: 'center',
   },
@@ -240,7 +264,7 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: Colors.primary,
     paddingVertical: 16,
-    borderRadius: 8,
+    borderRadius: 10,
     alignItems: 'center',
     marginTop: 8,
     marginBottom: 16,
