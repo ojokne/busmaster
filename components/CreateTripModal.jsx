@@ -58,7 +58,7 @@ const CreateTripModal = ({ visible, onClose, companyId }) => {
       });
 
       setMessageType('success');
-      setMessage('Trip created successfully!');
+      setMessage('Trip created successfully');
       clearInputs();
       setisLoading(false);
     } catch (error) {
@@ -73,7 +73,7 @@ const CreateTripModal = ({ visible, onClose, companyId }) => {
       visible={visible}
       animationType="slide"
       transparent={true}
-      onRequestClose={onClose}
+      // onRequestClose={onClose}
       testID="create-trip-modal">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -109,7 +109,7 @@ const CreateTripModal = ({ visible, onClose, companyId }) => {
                   style={styles.input}
                   placeholder="Lira"
                   value={to}
-                  onChange={setTo}
+                  onChangeText={setTo}
                   placeholderTextColor={Colors.textMuted}
                 />
               </View>
@@ -166,7 +166,7 @@ const CreateTripModal = ({ visible, onClose, companyId }) => {
                   testID="dateTime-picker-time"
                   value={time}
                   mode="time"
-                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  display={Platform.OS === 'ios' ? 'spinner' : 'spinner'}
                   onChange={(event, selectedTime) => {
                     setShowTimePicker(false);
                     if (selectedTime) setTime(selectedTime);

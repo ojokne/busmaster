@@ -1,0 +1,60 @@
+appId: com.oen.busmaster
+---
+- runFlow: ../common/Signin.yaml
+
+# open and close modal
+- tapOn:
+    id: 'create-trip'
+- assertVisible: 'Create Trip'
+- assertVisible: 'From (Boarding Point)'
+- assertVisible: 'To (Destination)'
+- assertVisible: 'Bus Registration'
+- assertVisible: 'Trip Date'
+- assertVisible: 'Departure Time'
+- assertVisible:
+    id: 'submit-button'
+
+# check if error message display when an empty form is submitted
+- tapOn:
+    id: 'submit-button'
+- assertVisible: 'All fields are required.'
+- tapOn:
+    id: 'close-button'
+
+# create trip
+- tapOn:
+    id: 'create-trip'
+
+- tapOn:
+    id: 'input-from'
+- inputText: 'Kampala'
+- hideKeyboard
+
+- tapOn:
+    id: 'input-to'
+- inputText: 'Lira'
+- hideKeyboard
+
+- tapOn:
+    id: 'input-bus-reg'
+- inputText: 'UAX123X'
+- hideKeyboard
+
+- tapOn:
+    id: 'input-date'
+- tapOn: 'OK'
+- hideKeyboard
+
+- tapOn:
+    id: 'input-time'
+- tapOn: 'OK'
+- hideKeyboard
+
+- tapOn:
+    id: 'submit-button'
+
+- assertVisible: 'Trip created successfully'
+
+- tapOn:
+    id: 'close-button'
+- clearState
