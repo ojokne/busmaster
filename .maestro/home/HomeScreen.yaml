@@ -16,6 +16,6 @@ appId: com.oen.busmaster
 
 - tapOn:
     id: "sellTicketTab"  
-- assertVisible: "Sell ticket"  
+- assertVisible: "Available Trips"  
 
 - clearState
