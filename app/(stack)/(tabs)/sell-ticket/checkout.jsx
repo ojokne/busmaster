@@ -15,9 +15,9 @@ import { addDoc, arrayUnion, collection, doc, updateDoc } from 'firebase/firesto
 import { auth, db } from '../../../../config/firebase';
 
 export default function CheckoutScreen() {
-  const { seats, from, to, seatPrice, tripId } = useLocalSearchParams();
+  const { seats, from, to, amountPerSeat, tripId } = useLocalSearchParams();
   const parsedSeats = seats ? JSON.parse(seats) : [];
-  const pricePerSeat = seatPrice ? parseFloat(seatPrice) : 0;
+  const pricePerSeat = amountPerSeat ? parseFloat(amountPerSeat) : 0;
   const totalPrice = parsedSeats.length * pricePerSeat;
   const router = useRouter();
   const [loading, setLoading] = useState(false);

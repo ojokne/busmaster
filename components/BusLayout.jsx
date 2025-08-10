@@ -15,7 +15,7 @@ import Colors from '../constants/colors';
 import { collection, doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../config/firebase';
 
-const BusLayout = ({ totalSeats, from, to, tripId }) => {
+const BusLayout = ({ totalSeats, from, to, tripId, amountPerSeat }) => {
   const [selectedSeats, setSelectedSeats] = useState([]);
   const router = useRouter();
   const [modalVisible, setModalVisible] = useState(false);
@@ -57,7 +57,7 @@ const BusLayout = ({ totalSeats, from, to, tripId }) => {
         seats: JSON.stringify(selectedSeats),
         from,
         to,
-        seatPrice: 40000,
+        amountPerSeat,
         tripId,
       },
     });

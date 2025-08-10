@@ -31,6 +31,11 @@ export default function BusLayoutScreen() {
     if (id) {
       getTrip();
     }
+
+    return () => {
+      setTrip(null);
+      setLoading(true);
+    };
   }, [id]);
 
   if (loading) {
@@ -58,6 +63,7 @@ export default function BusLayoutScreen() {
         from={trip.from}
         to={trip.to}
         tripId={id}
+        amountPerSeat={trip.amountPerSeat}
       />
     </View>
   );

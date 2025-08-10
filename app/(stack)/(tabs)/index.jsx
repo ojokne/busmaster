@@ -19,7 +19,7 @@ const HomeScreen = () => {
 
   const [recentTrips, setRecentTrips] = useState([]);
   const handleCreateTrip = () => {
-    setShowModal(true);
+    router.push('create-trip');
   };
 
   const handleSellTicket = () => {
@@ -115,7 +115,14 @@ const HomeScreen = () => {
                     {trip.time}
                   </Text>
                 </View>
-                <Text style={styles.tickets}>Seats booked: {trip.occupiedSeats?.length || 0}</Text>
+                <View>
+                  <Text style={styles.tickets}>
+                    Seats booked: {trip.occupiedSeats?.length || 0}
+                  </Text>
+                  <Text style={styles.tripDate}>
+                    UGX {Number(trip.amountPerSeat).toLocaleString('en-us')}
+                  </Text>
+                </View>
               </Pressable>
             ))
           )}
