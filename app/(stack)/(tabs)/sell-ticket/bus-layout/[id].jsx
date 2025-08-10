@@ -3,6 +3,9 @@ import { useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../../../../config/firebase';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import BusLayout from '../../../../../components/BusLayout';
+import Colors from '../../../../../constants/colors';
+import { StatusBar } from 'expo-status-bar';
 
 export default function BusLayoutScreen() {
   const { id } = useLocalSearchParams();
@@ -32,8 +35,8 @@ export default function BusLayoutScreen() {
 
   if (loading) {
     return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" />
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={Colors.primary} />
       </View>
     );
   }
@@ -48,13 +51,14 @@ export default function BusLayoutScreen() {
 
   return (
     <View style={styles.container}>
-      <Text>
-        {trip.from} → {trip.to}
-      </Text>
-      <Text>
-        {trip.date} at {trip.time}
-      </Text>
-      {/* You can now render your seat layout here */}
+      <StatusBar style="dark" />
+      <BusLayout
+        totalSeats={53}
+        bookedSeats={trip?.occupiedSeats || []}
+        from={trip.from}
+        to={trip.to}
+        tripId={id}
+      />
     </View>
   );
 }
@@ -62,7 +66,11 @@ export default function BusLayoutScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 24,
     backgroundColor: '#fff',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

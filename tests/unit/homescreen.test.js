@@ -65,8 +65,8 @@ describe('HomeScreen', () => {
     await waitFor(() => screen.getByTestId('create-trip'));
     expect(screen.getByTestId('create-trip')).toBeOnTheScreen();
 
-    await waitFor(() => screen.getByTestId('recent-tickets'));
-    expect(screen.getByTestId('recent-tickets')).toBeOnTheScreen();
+    await waitFor(() => screen.getByTestId('recent-trips'));
+    expect(screen.getByTestId('recent-trips')).toBeOnTheScreen();
   });
 
   test('navigates to Sell Ticket screen when Sell Ticket button is pressed', () => {
@@ -84,13 +84,5 @@ describe('HomeScreen', () => {
     fireEvent.press(createTripButton);
     await waitFor(() => screen.getByTestId('create-trip-modal'));
     expect(screen.getByTestId('create-trip-modal')).toBeOnTheScreen();
-  });
-
-  test('navigates to All Tickets screen when See All is pressed', () => {
-    render(<HomeScreen />);
-
-    const createTripButton = screen.getByTestId('all-tickets');
-    fireEvent.press(createTripButton);
-    expect(mockPush).toHaveBeenCalledWith('/tickets');
   });
 });

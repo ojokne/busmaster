@@ -7,7 +7,7 @@ appId: com.oen.busmaster
 - assertVisible: "Sell Ticket"
 - assertVisible: "Create Trip"
 - assertVisible: "Tickets Sold"
-- assertVisible: "Recent Tickets"
+- assertVisible: "Recent Trips"
 
 - tapOn:
     id: "ProfileTab"  

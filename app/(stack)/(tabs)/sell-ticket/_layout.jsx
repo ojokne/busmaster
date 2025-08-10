@@ -22,6 +22,15 @@ export default function Layout() {
         options={{
           headerShadowVisible: false,
           title: 'Bus Layout',
+          headerShown: false,
+        }}
+      />
+
+      <Stack.Screen
+        name="checkout"
+        options={{
+          headerShadowVisible: false,
+          title: 'Checkout',
         }}
       />
     </Stack>

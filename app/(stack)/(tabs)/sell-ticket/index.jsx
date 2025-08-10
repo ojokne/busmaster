@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -8,11 +8,12 @@ import {
   Pressable,
   TextInput,
 } from 'react-native';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { db } from '../../../../config/firebase';
-import { useFocusEffect, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import Colors from '../../../../constants/colors';
+import { AntDesign, Entypo, FontAwesome5 } from '@expo/vector-icons';
 
 export default function SellTicketsScreen() {
   const [trips, setTrips] = useState([]);
@@ -29,45 +30,43 @@ export default function SellTicketsScreen() {
     );
   });
 
-  const fetchTrips = async () => {
-    try {
-      const tripsRef = collection(db, 'trips');
-      const q = query(tripsRef, orderBy('createdAt', 'desc'));
-      const querySnapshot = await getDocs(q);
+  useEffect(() => {
+    const tripsRef = collection(db, 'trips');
+    const q = query(tripsRef, orderBy('createdAt', 'desc'));
 
-      const tripData = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const tripData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setTrips(tripData);
+        setLoading(false);
+      },
+      (error) => {
+        console.error('Error fetching trips:', error);
+        setLoading(false);
+      },
+    );
 
-      setTrips(tripData);
-    } catch (error) {
-      console.error('Error fetching trips:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-  useFocusEffect(
-    useCallback(() => {
-      fetchTrips();
-      return () => {
-        setTrips([]);
-        setLoading(true);
-      };
-    }, []),
-  );
+    return () => unsubscribe(); // Cleanup listener on unmount
+  }, []);
 
   const renderTrip = ({ item }) => (
     <Pressable
       style={styles.tripItem}
       onPress={() => router.push(`/sell-ticket/bus-layout/${item.id}`)}>
       <Text style={styles.tripRoute}>
-        {item.from} → {item.to}
+        {item.from} <AntDesign name="arrowright" /> {item.to}
       </Text>
       <Text style={styles.tripInfo}>
-        Date: {item.date} • Time: {item.time}
+        <AntDesign name="calendar" /> {item.date} <Entypo name="dot-single" />{' '}
+        <AntDesign name="clockcircleo" /> {item.time}
       </Text>
-      <Text style={styles.tripInfo}>Bus: {item.busRegistration}</Text>
+      <Text style={styles.tripInfo}>
+        <FontAwesome5 name="bus" /> {item.busRegistration}
+      </Text>
     </Pressable>
   );
 

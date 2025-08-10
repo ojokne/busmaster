@@ -20,6 +20,10 @@ const Colors = {
   warning: '#FF9500',
 
   overlay: 'rgba(0,0,0,0.4)',
+
+  availableSeat: '#e0e0e0',
+  selectedSeat: '#4CAF50',
+  occupiedSeat: '#f44336',
 };
 
 export default Colors;

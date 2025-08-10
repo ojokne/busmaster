@@ -20,6 +20,32 @@ jest.mock('firebase/auth', () => ({
 }));
 jest.mock('firebase/firestore', () => ({
   getFirestore: jest.fn(() => ({})),
+  collection: jest.fn(() => {}),
+  orderBy: jest.fn(() => {}),
+  limit: jest.fn(() => {}),
+  query: jest.fn(() => {}),
+  onSnapshot: jest.fn((q, callback) => {
+    callback({
+      docs: [
+        {
+          id: 'trip1',
+          data: () => ({
+            route: 'Kampala - Gulu',
+            date: '2025-08-10',
+          }),
+        },
+        {
+          id: 'trip2',
+          data: () => ({
+            route: 'Lira - Mbale',
+            date: '2025-08-09',
+          }),
+        },
+      ],
+    });
+
+    return jest.fn(); // this is the mock unsubscribe function
+  }),
 }));
 
 jest.mock('expo-router', () => ({

@@ -55,6 +55,7 @@ const CreateTripModal = ({ visible, onClose, companyId }) => {
         time: time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         companyId,
         createdAt: new Date().toISOString(),
+        occupiedSeats: [],
       });
 
       setMessageType('success');
