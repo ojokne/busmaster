@@ -5,10 +5,10 @@ appId: com.oen.busmaster
 # open and close modal
 - tapOn:
     id: 'create-trip'
-- assertVisible: 'Create Trip'
 - assertVisible: 'From (Boarding Point)'
 - assertVisible: 'To (Destination)'
 - assertVisible: 'Bus Registration'
+- assertVisible: 'Amount per Seat (UGX)'
 - assertVisible: 'Trip Date'
 - assertVisible: 'Departure Time'
 - assertVisible:
@@ -18,8 +18,7 @@ appId: com.oen.busmaster
 - tapOn:
     id: 'submit-button'
 - assertVisible: 'All fields are required.'
-- tapOn:
-    id: 'close-button'
+- back
 
 # create trip
 - tapOn:
@@ -41,13 +40,8 @@ appId: com.oen.busmaster
 - hideKeyboard
 
 - tapOn:
-    id: 'input-date'
-- tapOn: 'OK'
-- hideKeyboard
-
-- tapOn:
-    id: 'input-time'
-- tapOn: 'OK'
+    id: 'amount-per-seat'
+- inputText: '30000'
 - hideKeyboard
 
 - tapOn:
@@ -55,6 +49,5 @@ appId: com.oen.busmaster
 
 - assertVisible: 'Trip created successfully'
 
-- tapOn:
-    id: 'close-button'
+- back
 - clearState

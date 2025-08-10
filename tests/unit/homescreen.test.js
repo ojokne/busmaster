@@ -82,7 +82,6 @@ describe('HomeScreen', () => {
 
     const createTripButton = screen.getByTestId('create-trip');
     fireEvent.press(createTripButton);
-    await waitFor(() => screen.getByTestId('create-trip-modal'));
-    expect(screen.getByTestId('create-trip-modal')).toBeOnTheScreen();
+    expect(mockPush).toHaveBeenCalledWith('/create-trip');
   });
 });

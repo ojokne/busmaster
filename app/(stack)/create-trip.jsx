@@ -75,7 +75,8 @@ const CreateTripScreen = () => {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.keyboardAvoidingViewContainer}>
+      style={styles.keyboardAvoidingViewContainer}
+      testID="create-trip-screen">
       <StatusBar style="dark" />
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView
@@ -86,6 +87,7 @@ const CreateTripScreen = () => {
             <View>
               <Text style={styles.label}>From (Boarding Point)</Text>
               <TextInput
+                testID="input-from"
                 style={styles.input}
                 placeholder="Kampala"
                 value={from}
@@ -97,6 +99,7 @@ const CreateTripScreen = () => {
             <View>
               <Text style={styles.label}>To (Destination)</Text>
               <TextInput
+                testID="input-to"
                 style={styles.input}
                 placeholder="Lira"
                 value={to}
@@ -108,6 +111,7 @@ const CreateTripScreen = () => {
             <View>
               <Text style={styles.label}>Bus Registration</Text>
               <TextInput
+                testID="input-bus-reg"
                 style={styles.input}
                 placeholder="UAX123X"
                 value={busReg}
@@ -119,6 +123,7 @@ const CreateTripScreen = () => {
             <View>
               <Text style={styles.label}>Amount per Seat (UGX)</Text>
               <TextInput
+                testID="amount-per-seat"
                 style={styles.input}
                 placeholder="e.g. 25000"
                 value={amountPerSeat}
@@ -130,14 +135,20 @@ const CreateTripScreen = () => {
 
             <View>
               <Text style={styles.label}>Trip Date</Text>
-              <Pressable style={styles.input} onPress={() => setShowDatePicker(true)}>
+              <Pressable
+                testID="input-date"
+                style={styles.input}
+                onPress={() => setShowDatePicker(true)}>
                 <Text style={styles.dateTimePlaceholder}>{date.toDateString()}</Text>
               </Pressable>
             </View>
 
             <View>
               <Text style={styles.label}>Departure Time</Text>
-              <Pressable style={styles.input} onPress={() => setShowTimePicker(true)}>
+              <Pressable
+                testID="input-time"
+                style={styles.input}
+                onPress={() => setShowTimePicker(true)}>
                 <Text style={styles.dateTimePlaceholder}>
                   {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </Text>
@@ -146,6 +157,7 @@ const CreateTripScreen = () => {
 
             {showDatePicker && (
               <DateTimePicker
+                testID="dateTime-picker-date"
                 value={date}
                 mode="date"
                 display={Platform.OS === 'ios' ? 'spinner' : 'default'}
@@ -158,6 +170,7 @@ const CreateTripScreen = () => {
 
             {showTimePicker && (
               <DateTimePicker
+                testID="dateTime-picker-time"
                 value={time}
                 mode="time"
                 display={Platform.OS === 'ios' ? 'spinner' : 'default'}
@@ -170,6 +183,7 @@ const CreateTripScreen = () => {
 
             {message && (
               <Text
+                testID="feedback-message"
                 style={[
                   styles.feedback,
                   messageType === 'success' ? styles.success : styles.error,
@@ -178,7 +192,7 @@ const CreateTripScreen = () => {
               </Text>
             )}
 
-            <Pressable style={styles.button} onPress={handleSubmit}>
+            <Pressable style={styles.button} onPress={handleSubmit} testID="submit-button">
               <Text style={styles.buttonText}>
                 {isLoading ? 'Creating Trip...' : 'Create Trip'}
               </Text>

@@ -19,7 +19,7 @@ const HomeScreen = () => {
 
   const [recentTrips, setRecentTrips] = useState([]);
   const handleCreateTrip = () => {
-    router.push('create-trip');
+    router.push('/create-trip');
   };
 
   const handleSellTicket = () => {
