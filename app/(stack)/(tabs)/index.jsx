@@ -1,23 +1,26 @@
-import { useEffect, useState } from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { View, Text, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
 import { Feather, FontAwesome5, FontAwesome, AntDesign } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import Colors from '../../../constants/colors';
 import CreateTripModal from '../../../components/CreateTripModal';
-import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { collection, query, orderBy, limit, onSnapshot, getDocs } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 import { db } from '../../../config/firebase';
 
 const HomeScreen = () => {
   const [showRevenue, setShowRevenue] = useState(false);
-  const router = useRouter();
-
   const [showModal, setShowModal] = useState(false);
+  const [dailyRevenue, setDailyRevenue] = useState(0);
+  const [dailyTicketsSold, setDailyTicketsSold] = useState(0);
+  const [recentTrips, setRecentTrips] = useState([]);
+  const [loadingTrips, setLoadingTrips] = useState(true);
+
+  const router = useRouter();
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
   const companyId = 'example-company-id';
 
-  const revenue = 154000;
-  const ticketsSold = 327;
-
-  const [recentTrips, setRecentTrips] = useState([]);
   const handleCreateTrip = () => {
     router.push('/create-trip');
   };
@@ -37,6 +40,7 @@ const HomeScreen = () => {
           id: doc.id,
           ...doc.data(),
         }));
+        setLoadingTrips(false);
         setRecentTrips(trips);
       },
       (error) => {
@@ -44,8 +48,62 @@ const HomeScreen = () => {
       },
     );
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      setLoadingTrips(true);
+    };
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!currentUser) return;
+
+      let isActive = true;
+
+      const fetchTodayStats = async () => {
+        try {
+          const tripsSnapshot = await getDocs(collection(db, 'trips'));
+
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+
+          let totalRevenue = 0;
+          let totalTickets = 0;
+
+          for (const tripDoc of tripsSnapshot.docs) {
+            const bookingsRef = collection(db, 'trips', tripDoc.id, 'bookings');
+            const bookingsSnapshot = await getDocs(bookingsRef);
+
+            bookingsSnapshot.forEach((bookingDoc) => {
+              const data = bookingDoc.data();
+              const bookingDate = data.bookedAt?.toDate();
+
+              const isToday = bookingDate && bookingDate.toDateString() === today.toDateString();
+              const isCurrentUser = data.userId === currentUser.uid;
+
+              if (isToday && isCurrentUser) {
+                totalRevenue += data.totalPrice || 0;
+                totalTickets += data.selectedSeats?.length || 0;
+              }
+            });
+          }
+
+          if (isActive) {
+            setDailyRevenue(totalRevenue);
+            setDailyTicketsSold(totalTickets);
+          }
+        } catch (error) {
+          console.error("Error fetching today's bookings:", error);
+        }
+      };
+
+      fetchTodayStats();
+
+      return () => {
+        isActive = false; // Prevent state update if component unmounted
+      };
+    }, [currentUser]),
+  );
 
   return (
     <View style={styles.container}>
@@ -65,7 +123,7 @@ const HomeScreen = () => {
               </Pressable>
             </View>
             <Text style={styles.amount} testID="total-revenue">
-              {showRevenue ? `UGX ${revenue.toLocaleString()}` : '••••••'}
+              {showRevenue ? `UGX ${dailyRevenue.toLocaleString()}` : '••••••'}
             </Text>
           </View>
 
@@ -74,20 +132,23 @@ const HomeScreen = () => {
               Tickets Sold
             </Text>
             <Text style={styles.amount} testID="total-tickets-sold">
-              {ticketsSold}
+              {dailyTicketsSold}
             </Text>
           </View>
         </View>
       </View>
+
       <View style={styles.body}>
         <Text style={styles.sectionTitle} testID="quick-actions-title">
           Quick Actions
         </Text>
+
         <View style={styles.actionsContainer}>
           <Pressable style={styles.actionCard} onPress={handleSellTicket} testID="sell-ticket">
             <FontAwesome5 name="bus" size={24} color={Colors.primary} />
             <Text style={styles.actionText}>Sell Ticket</Text>
           </Pressable>
+
           <Pressable style={styles.actionCard} onPress={handleCreateTrip} testID="create-trip">
             <FontAwesome name="road" size={28} color={Colors.primary} />
             <Text style={styles.actionText}>Create Trip</Text>
@@ -98,36 +159,46 @@ const HomeScreen = () => {
           <Text style={styles.sectionTitle} testID="recent-trips">
             Recent Trips
           </Text>
-          {recentTrips.length === 0 ? (
-            <Text style={{ textAlign: 'center' }}>No recent trips.</Text>
-          ) : (
-            recentTrips.map((trip) => (
-              <Pressable
-                key={trip.id}
-                style={styles.tripItem}
-                onPress={() => router.push(`sell-ticket/bus-layout/${trip.id}`)}>
-                <View>
-                  <Text style={styles.tripName}>
-                    {trip.from} <AntDesign name="arrowright" /> {trip.to}
-                  </Text>
-                  <Text style={styles.tripDate}>
-                    <AntDesign name="calendar" /> {trip.date} <AntDesign name="clockcircleo" />{' '}
-                    {trip.time}
-                  </Text>
-                </View>
-                <View>
-                  <Text style={styles.tickets}>
-                    Seats booked: {trip.occupiedSeats?.length || 0}
-                  </Text>
-                  <Text style={styles.tripDate}>
-                    UGX {Number(trip.amountPerSeat).toLocaleString('en-us')}
-                  </Text>
-                </View>
-              </Pressable>
-            ))
-          )}
+          <View>
+            {loadingTrips ? (
+              <ActivityIndicator size="large" color={Colors.primary} />
+            ) : (
+              <View>
+                {recentTrips.length === 0 ? (
+                  <Text style={{ textAlign: 'center' }}>No recent trips.</Text>
+                ) : (
+                  recentTrips.map((trip) => (
+                    <Pressable
+                      key={trip.id}
+                      style={styles.tripItem}
+                      onPress={() => router.push(`sell-ticket/bus-layout/${trip.id}`)}>
+                      <View>
+                        <Text style={styles.tripName}>
+                          {trip.from} <AntDesign name="arrowright" /> {trip.to}
+                        </Text>
+                        <Text style={styles.tripDate}>
+                          <AntDesign name="calendar" /> {trip.date}{' '}
+                          <AntDesign name="clockcircleo" /> {trip.time}
+                        </Text>
+                      </View>
+                      <View>
+                        <View style={{ flexDirection: 'row' }}>
+                          <Text style={styles.tickets}>Seats booked:</Text>
+                          <Text style={styles.ticketSold}>{trip.occupiedSeats?.length || 0}</Text>
+                        </View>
+                        <Text style={styles.tripDate}>
+                          UGX {Number(trip.amountPerSeat).toLocaleString('en-us')}
+                        </Text>
+                      </View>
+                    </Pressable>
+                  ))
+                )}
+              </View>
+            )}
+          </View>
         </View>
       </View>
+
       <CreateTripModal
         visible={showModal}
         onClose={() => setShowModal(false)}
@@ -213,17 +284,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.primary,
   },
-  ticketsHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  seeAllText: {
-    color: Colors.primary,
-    fontWeight: '500',
-    fontSize: 14,
-  },
   tripItem: {
     backgroundColor: Colors.white,
     padding: 14,
@@ -243,8 +303,13 @@ const styles = StyleSheet.create({
   },
   tickets: {
     fontSize: 16,
+    color: Colors.textMuted,
+  },
+  ticketSold: {
+    fontSize: 16,
     fontWeight: 'bold',
     color: Colors.textMuted,
+    paddingStart: 4,
   },
 });
 
