@@ -163,7 +163,6 @@ const BusLayout = ({ totalSeats, from, to, tripId, amountPerSeat }) => {
     <View style={{ flex: 1, paddingBottom: 140, width: '100%' }}>
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} style={styles.navButton}>
-          {/* <Text style={styles.navText}>Back</Text> */}
           <AntDesign name="arrowleft" size={24} />
         </Pressable>
 
@@ -195,7 +194,7 @@ const BusLayout = ({ totalSeats, from, to, tripId, amountPerSeat }) => {
           <Text>Occupied</Text>
         </View>
       </View>
-
+      {/* 
       <Modal
         visible={modalVisible}
         animationType="fade"
@@ -224,6 +223,36 @@ const BusLayout = ({ totalSeats, from, to, tripId, amountPerSeat }) => {
             </View>
           </View>
         </View>
+      </Modal> */}
+      <Modal
+        visible={modalVisible}
+        animationType="fade"
+        transparent
+        onRequestClose={() => setModalVisible(false)}>
+        <Pressable style={styles.modalOverlay} onPress={() => setModalVisible(false)}>
+          {/* Prevent clicks inside modalBox from closing the modal */}
+          <Pressable style={styles.modalBox} onPress={() => {}}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Passenger Info</Text>
+              <Pressable onPress={() => setModalVisible(false)}>
+                <AntDesign name="close" size={22} color="#6B7280" />
+              </Pressable>
+            </View>
+
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Seat</Text>
+              <Text style={styles.detailValue}>{passengerInfo?.seat}</Text>
+            </View>
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Name</Text>
+              <Text style={styles.detailValue}>{passengerInfo?.fullName}</Text>
+            </View>
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Phone</Text>
+              <Text style={styles.detailValue}>{passengerInfo?.phone}</Text>
+            </View>
+          </Pressable>
+        </Pressable>
       </Modal>
     </View>
   );
