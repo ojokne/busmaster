@@ -14,10 +14,12 @@ import Colors from '../../../../constants/colors';
 import { addDoc, arrayUnion, collection, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../../../config/firebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { printTicket } from '../../../../utils';
 
 export default function CheckoutScreen() {
   const { seats, from, to, amountPerSeat, tripId } = useLocalSearchParams();
   const parsedSeats = seats ? JSON.parse(seats) : [];
+
   const pricePerSeat = amountPerSeat ? parseFloat(amountPerSeat) : 0;
   const totalPrice = parsedSeats.length * pricePerSeat;
   const router = useRouter();
@@ -56,6 +58,15 @@ export default function CheckoutScreen() {
         // Update occupiedSeats array on trip document
         await updateDoc(tripRef, {
           occupiedSeats: arrayUnion(...parsedSeats),
+        });
+
+        await printTicket({
+          fullName,
+          phone,
+          from,
+          to,
+          seats: parsedSeats,
+          totalPrice,
         });
         setLoading(false);
         router.replace('sell-ticket');

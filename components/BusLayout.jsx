@@ -14,6 +14,7 @@ import { AntDesign } from '@expo/vector-icons';
 import Colors from '../constants/colors';
 import { collection, doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../config/firebase';
+import { printSingleTicket } from '../utils';
 
 const BusLayout = ({ totalSeats, from, to, tripId, amountPerSeat }) => {
   const [selectedSeats, setSelectedSeats] = useState([]);
@@ -125,6 +126,9 @@ const BusLayout = ({ totalSeats, from, to, tripId, amountPerSeat }) => {
     return seats;
   };
 
+  const printTicket = async (fullName, phone, from, to, seat, amountPerSeat) => {
+    await printSingleTicket(fullName, phone, from, to, seat, amountPerSeat);
+  };
   useEffect(() => {
     const tripRef = doc(db, 'trips', tripId);
     const unsubscribeTrip = onSnapshot(tripRef, (snapshot) => {
@@ -222,6 +226,22 @@ const BusLayout = ({ totalSeats, from, to, tripId, amountPerSeat }) => {
               <Text style={styles.detailLabel}>Phone</Text>
               <Text style={styles.detailValue}>{passengerInfo?.phone}</Text>
             </View>
+            {passengerInfo !== null ? (
+              <Pressable
+                style={styles.button}
+                onPress={() =>
+                  printTicket(
+                    passengerInfo?.fullName,
+                    passengerInfo?.phone,
+                    from,
+                    to,
+                    passengerInfo?.seat,
+                    amountPerSeat,
+                  )
+                }>
+                <Text style={styles.buttonText}>Print Ticket</Text>
+              </Pressable>
+            ) : null}
           </Pressable>
         </Pressable>
       </Modal>
@@ -344,6 +364,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#111827',
+  },
+  button: {
+    backgroundColor: Colors.primary,
+    paddingVertical: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

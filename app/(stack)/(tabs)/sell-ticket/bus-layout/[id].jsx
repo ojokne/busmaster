@@ -2,15 +2,20 @@ import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../../../../config/firebase';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Pressable } from 'react-native';
 import BusLayout from '../../../../../components/BusLayout';
 import Colors from '../../../../../constants/colors';
 import { StatusBar } from 'expo-status-bar';
+import { connectToPrinter, scanForDevices } from '../../../../../utils';
+import PrinterSelectionModal from '../../../../../components/PrinterSelectionModal';
 
 export default function BusLayoutScreen() {
   const { id } = useLocalSearchParams();
   const [trip, setTrip] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [devices, setDevices] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedPrinter, setSelectedPrinter] = useState(null);
 
   useEffect(() => {
     const getTrip = async () => {
@@ -38,6 +43,23 @@ export default function BusLayoutScreen() {
     };
   }, [id]);
 
+  useEffect(() => {
+    const getBlueToothDevices = async () => {
+      const devices = await scanForDevices();
+      setDevices(devices);
+    };
+
+    getBlueToothDevices();
+
+    if (!selectedPrinter) {
+      setModalVisible(true);
+    }
+
+    return () => {
+      setDevices([]);
+    };
+  }, [selectedPrinter]);
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -57,6 +79,7 @@ export default function BusLayoutScreen() {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
+
       <BusLayout
         totalSeats={53}
         bookedSeats={trip?.occupiedSeats || []}
@@ -64,6 +87,24 @@ export default function BusLayoutScreen() {
         to={trip.to}
         tripId={id}
         amountPerSeat={trip.amountPerSeat}
+      />
+
+      <Pressable style={styles.button} onPress={() => setModalVisible(true)}>
+        <Text style={styles.buttonText}>CHOOSE PRINTER: {selectedPrinter?.device_name}</Text>
+      </Pressable>
+
+      <PrinterSelectionModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        devices={devices}
+        onPrinterSelect={async (device) => {
+          const connected = connectToPrinter(device);
+          if (connected) {
+            setSelectedPrinter(device);
+            setModalVisible(false);
+          }
+        }}
+        loading={false}
       />
     </View>
   );
@@ -78,5 +119,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  button: {
+    backgroundColor: Colors.primary,
+    paddingVertical: 6,
+  },
+  buttonText: {
+    color: Colors.white,
+    textAlign: 'center',
+    fontWeight: 'bold',
   },
 });

@@ -1,6 +1,11 @@
 import { Stack } from 'expo-router';
+import { useEffect } from 'react';
+import { enableBluetooth } from '../../../../utils';
 
 export default function Layout() {
+  useEffect(() => {
+    enableBluetooth();
+  }, []);
   return (
     <Stack
       screenOptions={{
