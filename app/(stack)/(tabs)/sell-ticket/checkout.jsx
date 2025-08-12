@@ -12,7 +12,8 @@ import {
 import { useState } from 'react';
 import Colors from '../../../../constants/colors';
 import { addDoc, arrayUnion, collection, doc, updateDoc } from 'firebase/firestore';
-import { auth, db } from '../../../../config/firebase';
+import { db } from '../../../../config/firebase';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function CheckoutScreen() {
   const { seats, from, to, amountPerSeat, tripId } = useLocalSearchParams();
@@ -32,36 +33,33 @@ export default function CheckoutScreen() {
     }
 
     setLoading(true);
-    const user = auth.currentUser;
-
-    if (!user) {
-      alert('You must be logged in to confirm a booking.');
-      setLoading(false);
-      return;
-    }
 
     try {
       const tripRef = doc(db, 'trips', tripId);
+      const userId = await AsyncStorage.getItem('userId');
 
       // Add booking document to bookings subcollection
       const bookingsCol = collection(tripRef, 'bookings');
-      await addDoc(bookingsCol, {
-        userId: user.uid,
-        selectedSeats: parsedSeats,
-        passengerDetails: {
-          fullName,
-          phone,
-        },
-        totalPrice,
-        bookedAt: new Date(),
-      });
 
-      // Update occupiedSeats array on trip document
-      await updateDoc(tripRef, {
-        occupiedSeats: arrayUnion(...parsedSeats),
-      });
-      setLoading(false);
-      router.replace('sell-ticket');
+      if (userId !== null) {
+        await addDoc(bookingsCol, {
+          createdBy: userId,
+          selectedSeats: parsedSeats,
+          passengerDetails: {
+            fullName,
+            phone,
+          },
+          totalPrice,
+          bookedAt: new Date(),
+        });
+
+        // Update occupiedSeats array on trip document
+        await updateDoc(tripRef, {
+          occupiedSeats: arrayUnion(...parsedSeats),
+        });
+        setLoading(false);
+        router.replace('sell-ticket');
+      }
     } catch (error) {
       console.error('Error confirming booking:', error);
       setLoading(false);

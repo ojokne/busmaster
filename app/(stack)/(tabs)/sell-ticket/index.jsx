@@ -8,12 +8,13 @@ import {
   Pressable,
   TextInput,
 } from 'react-native';
-import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, where } from 'firebase/firestore';
 import { db } from '../../../../config/firebase';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import Colors from '../../../../constants/colors';
 import { AntDesign, Entypo, FontAwesome5 } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SellTicketsScreen() {
   const [trips, setTrips] = useState([]);
@@ -31,26 +32,48 @@ export default function SellTicketsScreen() {
   });
 
   useEffect(() => {
-    const tripsRef = collection(db, 'trips');
-    const q = query(tripsRef, orderBy('createdAt', 'desc'));
+    let unsubscribe = () => {};
 
-    const unsubscribe = onSnapshot(
-      q,
-      (snapshot) => {
-        const tripData = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setTrips(tripData);
-        setLoading(false);
-      },
-      (error) => {
-        console.error('Error fetching trips:', error);
-        setLoading(false);
-      },
-    );
+    const fetchUserAndListenToTrips = async () => {
+      try {
+        setLoading(true);
 
-    return () => unsubscribe(); // Cleanup listener on unmount
+        const companyId = await AsyncStorage.getItem('companyId');
+
+        if (companyId !== null) {
+          const tripsRef = collection(db, 'trips');
+          const q = query(
+            tripsRef,
+            where('companyId', '==', companyId),
+            orderBy('createdAt', 'desc'),
+          );
+
+          unsubscribe = onSnapshot(
+            q,
+            (snapshot) => {
+              const tripData = snapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+              }));
+              setTrips(tripData);
+              setLoading(false);
+            },
+            (error) => {
+              console.error('Error fetching trips:', error);
+              setLoading(false);
+            },
+          );
+        }
+      } catch (error) {
+        console.error('Error initializing trip listener:', error);
+        setLoading(false);
+      }
+    };
+
+    fetchUserAndListenToTrips();
+
+    // Cleanup listener on unmount
+    return () => unsubscribe();
   }, []);
 
   const renderTrip = ({ item }) => (

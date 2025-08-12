@@ -16,6 +16,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { StatusBar } from 'expo-status-bar';
 import { db } from '../../config/firebase';
 import Colors from '../../constants/colors';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CreateTripScreen = () => {
   const [from, setFrom] = useState('');
@@ -48,21 +49,30 @@ const CreateTripScreen = () => {
 
     try {
       setisLoading(true);
-      await addDoc(collection(db, 'trips'), {
-        from,
-        to,
-        busRegistration: busReg,
-        amountPerSeat: parseInt(amountPerSeat, 10),
-        date: date.toISOString().split('T')[0],
-        time: time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        companyId: 1,
-        createdAt: new Date().toISOString(),
-        occupiedSeats: [],
-      });
 
-      setMessageType('success');
-      setMessage('Trip created successfully');
-      clearInputs();
+      const companyId = await AsyncStorage.getItem('companyId');
+      const userId = await AsyncStorage.getItem('userId');
+      const companyName = await AsyncStorage.getItem('companyName');
+
+      if (userId !== null && companyId !== null && companyName !== null) {
+        await addDoc(collection(db, 'trips'), {
+          from,
+          to,
+          busRegistration: busReg,
+          amountPerSeat: parseInt(amountPerSeat, 10),
+          date: date.toISOString().split('T')[0],
+          time: time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          companyId: companyId,
+          companyName: companyName,
+          createdBy: userId,
+          createdAt: new Date().toISOString(),
+          occupiedSeats: [],
+        });
+
+        setMessageType('success');
+        setMessage('Trip created successfully');
+        clearInputs();
+      }
     } catch (error) {
       setMessageType('error');
       setMessage(`Error: ${error.message}`);

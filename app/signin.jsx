@@ -13,9 +13,11 @@ import {
 import Colors from '../constants/colors';
 import { AntDesign, Feather } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import { auth } from '@/config/firebase';
+import { auth, db } from '@/config/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { doc, getDoc } from 'firebase/firestore';
 
 const SigninScreen = ({ onLogin }) => {
   const router = useRouter();
@@ -44,7 +46,23 @@ const SigninScreen = ({ onLogin }) => {
 
     try {
       setIsLoading(true);
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      const userDocRef = doc(db, 'users', user.uid);
+      const userSnap = await getDoc(userDocRef);
+
+      if (!userSnap.exists()) {
+        throw new Error('User not found');
+      }
+
+      const { companyId, companyName } = userSnap.data();
+      const userId = user.uid;
+
+      await AsyncStorage.setItem('userId', userId);
+      await AsyncStorage.setItem('companyId', companyId);
+      await AsyncStorage.setItem('companyName', companyName);
+
       router.replace('/(tabs)');
       setError('');
     } catch (e) {

@@ -1,25 +1,20 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { View, Text, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
 import { Feather, FontAwesome5, FontAwesome, AntDesign } from '@expo/vector-icons';
 import { useFocusEffect, useRouter } from 'expo-router';
 import Colors from '../../../constants/colors';
-import CreateTripModal from '../../../components/CreateTripModal';
-import { collection, query, orderBy, limit, onSnapshot, getDocs } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+import { collection, query, orderBy, limit, getDocs, where } from 'firebase/firestore';
 import { db } from '../../../config/firebase';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HomeScreen = () => {
   const [showRevenue, setShowRevenue] = useState(false);
-  const [showModal, setShowModal] = useState(false);
   const [dailyRevenue, setDailyRevenue] = useState(0);
   const [dailyTicketsSold, setDailyTicketsSold] = useState(0);
   const [recentTrips, setRecentTrips] = useState([]);
   const [loadingTrips, setLoadingTrips] = useState(true);
 
   const router = useRouter();
-  const auth = getAuth();
-  const currentUser = auth.currentUser;
-  const companyId = 'example-company-id';
 
   const handleCreateTrip = () => {
     router.push('/create-trip');
@@ -29,66 +24,83 @@ const HomeScreen = () => {
     router.push('/sell-ticket');
   };
 
-  useEffect(() => {
-    const tripsRef = collection(db, 'trips');
-    const q = query(tripsRef, orderBy('date', 'desc'), limit(3));
+  useFocusEffect(
+    useCallback(() => {
+      const fetchTrips = async () => {
+        try {
+          setLoadingTrips(true);
 
-    const unsubscribe = onSnapshot(
-      q,
-      (snapshot) => {
-        const trips = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setLoadingTrips(false);
-        setRecentTrips(trips);
-      },
-      (error) => {
-        console.error('Failed to fetch recent trips:', error);
-      },
-    );
+          const companyId = await AsyncStorage.getItem('companyId');
 
-    return () => {
-      unsubscribe();
-      setLoadingTrips(true);
-    };
-  }, []);
+          if (companyId !== null) {
+            const tripsRef = collection(db, 'trips');
+            const q = query(
+              tripsRef,
+              where('companyId', '==', companyId),
+              orderBy('date', 'desc'),
+              limit(3),
+            );
+
+            const querySnapshot = await getDocs(q);
+
+            const trips = querySnapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }));
+            setRecentTrips(trips);
+          }
+        } catch (error) {
+          console.error('Error fetching trips:', error);
+        } finally {
+          setLoadingTrips(false);
+        }
+      };
+
+      fetchTrips();
+
+      return () => {
+        setLoadingTrips(true);
+      };
+    }, []),
+  );
 
   useFocusEffect(
     useCallback(() => {
-      if (!currentUser) return;
-
-      let isActive = true;
-
       const fetchTodayStats = async () => {
         try {
-          const tripsSnapshot = await getDocs(collection(db, 'trips'));
+          const companyId = await AsyncStorage.getItem('companyId');
+          const userId = await AsyncStorage.getItem('userId');
 
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
+          if (userId !== null && companyId !== null) {
+            const tripsRef = collection(db, 'trips');
+            const q = query(tripsRef, where('companyId', '==', companyId));
+            const tripsSnapshot = await getDocs(q);
 
-          let totalRevenue = 0;
-          let totalTickets = 0;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
 
-          for (const tripDoc of tripsSnapshot.docs) {
-            const bookingsRef = collection(db, 'trips', tripDoc.id, 'bookings');
-            const bookingsSnapshot = await getDocs(bookingsRef);
+            let totalRevenue = 0;
+            let totalTickets = 0;
 
-            bookingsSnapshot.forEach((bookingDoc) => {
-              const data = bookingDoc.data();
-              const bookingDate = data.bookedAt?.toDate();
+            for (const tripDoc of tripsSnapshot.docs) {
+              const bookingsRef = collection(db, 'trips', tripDoc.id, 'bookings');
+              const bookingsSnapshot = await getDocs(bookingsRef);
 
-              const isToday = bookingDate && bookingDate.toDateString() === today.toDateString();
-              const isCurrentUser = data.userId === currentUser.uid;
+              bookingsSnapshot.forEach((bookingDoc) => {
+                const data = bookingDoc.data();
 
-              if (isToday && isCurrentUser) {
-                totalRevenue += data.totalPrice || 0;
-                totalTickets += data.selectedSeats?.length || 0;
-              }
-            });
-          }
+                const bookingDate = data.bookedAt?.toDate();
 
-          if (isActive) {
+                const isToday = bookingDate && bookingDate.toDateString() === today.toDateString();
+                const createdByUser = userId === data.createdBy;
+
+                if (isToday && createdByUser) {
+                  totalRevenue += data.totalPrice || 0;
+                  totalTickets += data.selectedSeats?.length || 0;
+                }
+              });
+            }
+
             setDailyRevenue(totalRevenue);
             setDailyTicketsSold(totalTickets);
           }
@@ -99,12 +111,9 @@ const HomeScreen = () => {
 
       fetchTodayStats();
 
-      return () => {
-        isActive = false; // Prevent state update if component unmounted
-      };
-    }, [currentUser]),
+      return () => {};
+    }, []),
   );
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -198,12 +207,6 @@ const HomeScreen = () => {
           </View>
         </View>
       </View>
-
-      <CreateTripModal
-        visible={showModal}
-        onClose={() => setShowModal(false)}
-        companyId={companyId}
-      />
     </View>
   );
 };
