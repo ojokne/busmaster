@@ -88,7 +88,7 @@ export default function SellTicketsScreen() {
         <AntDesign name="clockcircleo" /> {item.time}
       </Text>
       <Text style={styles.tripInfo}>
-        <FontAwesome5 name="bus" /> {item.busRegistration}
+        <FontAwesome5 name="bus" /> {item.registration}
       </Text>
     </Pressable>
   );
