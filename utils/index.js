@@ -164,6 +164,7 @@ export const connectToPrinter = async (printer) => {
 export const printTicket = async ({ fullName, phone, from, to, seats, totalPrice }) => {
   try {
     const ESC = '\x1B';
+    const GS = '\x1D';
     const CENTER = ESC + 'a' + '\x01';
     const LEFT = ESC + 'a' + '\x00';
     const BOLD_ON = ESC + 'E' + '\x01';
@@ -172,8 +173,39 @@ export const printTicket = async ({ fullName, phone, from, to, seats, totalPrice
 
     const date = new Date().toLocaleDateString();
     const time = new Date().toLocaleTimeString();
-
     const seatList = seats.join(', ');
+    const qrData = `Ticket: ${fullName}-${seatList}`;
+
+    const storeLen = qrData.length + 3;
+    const pL = String.fromCharCode(storeLen % 256);
+    const pH = String.fromCharCode(Math.floor(storeLen / 256));
+
+    const qrCode =
+      GS +
+      '(k' +
+      '\x04\x00' +
+      '1A' +
+      '\x02\x00' + // Select model
+      GS +
+      '(k' +
+      '\x03\x00' +
+      '1C' +
+      '\x08' + // Size
+      GS +
+      '(k' +
+      '\x03\x00' +
+      '1E' +
+      '\x30' + // Error correction
+      GS +
+      '(k' +
+      pL +
+      pH +
+      '1P0' +
+      qrData + // Store data
+      GS +
+      '(k' +
+      '\x03\x00' +
+      '1Q0'; // Print QR
 
     const receipt =
       CENTER +
@@ -201,6 +233,8 @@ export const printTicket = async ({ fullName, phone, from, to, seats, totalPrice
       CENTER +
       LINE +
       '\n' +
+      qrCode +
+      '\n' +
       CENTER +
       'Thank you & safe travels!\n\n\n';
 
@@ -214,6 +248,7 @@ export const printTicket = async ({ fullName, phone, from, to, seats, totalPrice
 export const printSingleTicket = async (fullName, phone, from, to, seat, amountPerSeat) => {
   try {
     const ESC = '\x1B';
+    const GS = '\x1D';
     const CENTER = ESC + 'a' + '\x01';
     const LEFT = ESC + 'a' + '\x00';
     const BOLD_ON = ESC + 'E' + '\x01';
@@ -222,6 +257,38 @@ export const printSingleTicket = async (fullName, phone, from, to, seat, amountP
 
     const date = new Date().toLocaleDateString();
     const time = new Date().toLocaleTimeString();
+    const qrData = `Ticket: ${fullName}-${seat}`;
+
+    const storeLen = qrData.length + 3;
+    const pL = String.fromCharCode(storeLen % 256);
+    const pH = String.fromCharCode(Math.floor(storeLen / 256));
+
+    const qrCode =
+      GS +
+      '(k' +
+      '\x04\x00' +
+      '1A' +
+      '\x02\x00' + // Select model
+      GS +
+      '(k' +
+      '\x03\x00' +
+      '1C' +
+      '\x08' + // Size
+      GS +
+      '(k' +
+      '\x03\x00' +
+      '1E' +
+      '\x30' + // Error correction
+      GS +
+      '(k' +
+      pL +
+      pH +
+      '1P0' +
+      qrData + // Store data
+      GS +
+      '(k' +
+      '\x03\x00' +
+      '1Q0'; // Print QR
 
     const receipt =
       CENTER +
@@ -248,6 +315,8 @@ export const printSingleTicket = async (fullName, phone, from, to, seat, amountP
       `Date: ${date} ${time}\n` +
       CENTER +
       LINE +
+      '\n' +
+      qrCode +
       '\n' +
       CENTER +
       'Thank you & safe travels!\n\n\n';
