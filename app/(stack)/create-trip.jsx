@@ -94,6 +94,7 @@ const CreateTripScreen = () => {
         busId: selectedBus.id,
         registration: selectedBus.registration,
         seatCapacity: selectedBus.seatCapacity,
+        type: selectedBus.type,
       });
 
       setMessageType('success');

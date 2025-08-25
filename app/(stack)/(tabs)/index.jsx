@@ -186,7 +186,9 @@ const HomeScreen = () => {
                           {trip.from} <AntDesign name="arrowright" /> {trip.to}
                         </Text>
                         <Text style={styles.tripDate}>
-                          <AntDesign name="calendar" /> {trip.date}{' '}
+                          <AntDesign name="calendar" /> {trip.date}
+                        </Text>
+                        <Text style={styles.tripDate}>
                           <AntDesign name="clockcircleo" /> {trip.time}
                         </Text>
                       </View>
