@@ -15,6 +15,7 @@ import { StatusBar } from 'expo-status-bar';
 import Colors from '../../../../constants/colors';
 import { AntDesign, Entypo, FontAwesome5 } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { format } from 'date-fns';
 
 export default function SellTicketsScreen() {
   const [trips, setTrips] = useState([]);
@@ -84,8 +85,9 @@ export default function SellTicketsScreen() {
         {item.from} <AntDesign name="arrowright" /> {item.to}
       </Text>
       <Text style={styles.tripInfo}>
-        <AntDesign name="calendar" /> {item.date} <Entypo name="dot-single" />{' '}
-        <AntDesign name="clockcircleo" /> {item.time}
+        <AntDesign name="calendar" /> {format(item.startDateTime.toDate(), 'yyyy-MM-dd')}{' '}
+        <Entypo name="dot-single" /> <AntDesign name="clockcircleo" />{' '}
+        {format(item.startDateTime.toDate(), 'hh:mm a')}
       </Text>
       <Text style={styles.tripInfo}>
         <FontAwesome5 name="bus" /> {item.registration}

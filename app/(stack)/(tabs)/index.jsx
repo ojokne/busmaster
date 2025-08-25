@@ -3,9 +3,10 @@ import { View, Text, Pressable, StyleSheet, ActivityIndicator } from 'react-nati
 import { Feather, FontAwesome5, FontAwesome, AntDesign } from '@expo/vector-icons';
 import { useFocusEffect, useRouter } from 'expo-router';
 import Colors from '../../../constants/colors';
-import { collection, query, orderBy, limit, getDocs, where } from 'firebase/firestore';
+import { collection, query, orderBy, limit, getDocs, where, Timestamp } from 'firebase/firestore';
 import { db } from '../../../config/firebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { format } from 'date-fns';
 
 const HomeScreen = () => {
   const [showRevenue, setShowRevenue] = useState(false);
@@ -37,7 +38,8 @@ const HomeScreen = () => {
             const q = query(
               tripsRef,
               where('companyId', '==', companyId),
-              orderBy('date', 'desc'),
+              where('startDateTime', '>', Timestamp.now()),
+              orderBy('startDateTime', 'asc'),
               limit(3),
             );
 
@@ -186,10 +188,12 @@ const HomeScreen = () => {
                           {trip.from} <AntDesign name="arrowright" /> {trip.to}
                         </Text>
                         <Text style={styles.tripDate}>
-                          <AntDesign name="calendar" /> {trip.date}
+                          <AntDesign name="calendar" />{' '}
+                          {format(trip.startDateTime.toDate(), 'yyyy-MM-dd')}
                         </Text>
                         <Text style={styles.tripDate}>
-                          <AntDesign name="clockcircleo" /> {trip.time}
+                          <AntDesign name="clockcircleo" />{' '}
+                          {format(trip.startDateTime.toDate(), 'hh:mm a')}
                         </Text>
                       </View>
                       <View>

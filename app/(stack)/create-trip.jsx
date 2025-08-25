@@ -13,7 +13,7 @@ import {
   Modal,
   FlatList,
 } from 'react-native';
-import { collection, addDoc, query, where, getDocs } from 'firebase/firestore';
+import { collection, addDoc, query, where, getDocs, Timestamp } from 'firebase/firestore';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { StatusBar } from 'expo-status-bar';
 import { db } from '../../config/firebase';
@@ -80,16 +80,23 @@ const CreateTripScreen = () => {
 
       if (!userId || !companyId || !companyName) throw new Error('Missing user or company info.');
 
+      const combinedDateTime = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        time.getHours(),
+        time.getMinutes(),
+      );
+
       await addDoc(collection(db, 'trips'), {
         from,
         to,
         amountPerSeat: parseInt(amountPerSeat, 10),
-        date: date.toISOString().split('T')[0],
-        time: time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        startDateTime: Timestamp.fromDate(combinedDateTime),
         companyId,
         companyName,
         createdBy: userId,
-        createdAt: new Date().toISOString(),
+        createdAt: new Timestamp.now(),
         occupiedSeats: [],
         busId: selectedBus.id,
         registration: selectedBus.registration,
@@ -166,7 +173,7 @@ const CreateTripScreen = () => {
             <Text style={styles.label}>Departure Time</Text>
             <Pressable style={styles.input} onPress={() => setShowTimePicker(true)}>
               <Text style={styles.dateTimePlaceholder}>
-                {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}
               </Text>
             </Pressable>
 
