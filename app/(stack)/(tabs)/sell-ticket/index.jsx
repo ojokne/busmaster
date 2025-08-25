@@ -8,7 +8,7 @@ import {
   Pressable,
   TextInput,
 } from 'react-native';
-import { collection, query, orderBy, onSnapshot, where } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, where, Timestamp } from 'firebase/firestore';
 import { db } from '../../../../config/firebase';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -46,7 +46,8 @@ export default function SellTicketsScreen() {
           const q = query(
             tripsRef,
             where('companyId', '==', companyId),
-            orderBy('createdAt', 'desc'),
+            where('startDateTime', '>', Timestamp.now()),
+            orderBy('startDateTime', 'asc'),
           );
 
           unsubscribe = onSnapshot(
@@ -77,23 +78,47 @@ export default function SellTicketsScreen() {
     return () => unsubscribe();
   }, []);
 
-  const renderTrip = ({ item }) => (
-    <Pressable
-      style={styles.tripItem}
-      onPress={() => router.push(`/sell-ticket/bus-layout/${item.id}`)}>
-      <Text style={styles.tripRoute}>
-        {item.from} <AntDesign name="arrowright" /> {item.to}
-      </Text>
-      <Text style={styles.tripInfo}>
-        <AntDesign name="calendar" /> {format(item.startDateTime.toDate(), 'yyyy-MM-dd')}{' '}
-        <Entypo name="dot-single" /> <AntDesign name="clockcircleo" />{' '}
-        {format(item.startDateTime.toDate(), 'hh:mm a')}
-      </Text>
-      <Text style={styles.tripInfo}>
-        <FontAwesome5 name="bus" /> {item.registration}
-      </Text>
-    </Pressable>
-  );
+  const renderTrip = ({ item }) => {
+    const tripDate = item.startDateTime?.toDate();
+    const totalSeats = item.seatCapacity || 0;
+    const occupied = item.occupiedSeats?.length || 0;
+    const available = totalSeats - occupied;
+    const isFull = available <= 0;
+
+    return (
+      <Pressable
+        style={styles.tripItem}
+        onPress={() => router.push(`/sell-ticket/bus-layout/${item.id}`)}>
+        {/* Route */}
+        <Text style={styles.tripRoute}>
+          {item.from} <AntDesign name="arrowright" size={16} /> {item.to}
+        </Text>
+
+        {/* Date and Time */}
+        <Text style={styles.tripInfo}>
+          <AntDesign name="calendar" size={14} /> {format(tripDate, 'yyyy-MM-dd')}{' '}
+          <Entypo name="dot-single" /> <AntDesign name="clockcircleo" size={14} />{' '}
+          {format(tripDate, 'hh:mm a')}
+        </Text>
+
+        {/* Bus and Seats */}
+        <View style={styles.tripDetailsRow}>
+          <Text style={styles.tripInfo}>
+            <FontAwesome5 name="bus" size={14} /> {item.registration}
+          </Text>
+        </View>
+
+        <View style={styles.tripDetailsRow}>
+          <View style={[styles.statusBadge, isFull ? styles.full : styles.available]}>
+            <Text style={styles.statusText}>{isFull ? 'Full' : 'Seats Available'}</Text>
+          </View>
+          <Text style={styles.tripInfo}>
+            UGX {Number(item.amountPerSeat).toLocaleString('en-US')}
+          </Text>
+        </View>
+      </Pressable>
+    );
+  };
 
   if (loading) {
     return (
@@ -210,5 +235,32 @@ const styles = StyleSheet.create({
   backText: {
     fontSize: 15,
     color: Colors.primary,
+  },
+  tripDetailsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 6,
+  },
+
+  statusBadge: {
+    marginTop: 10,
+    alignSelf: 'flex-start',
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 16,
+  },
+
+  statusText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.white,
+  },
+
+  full: {
+    backgroundColor: '#FF4D4F', // red
+  },
+
+  available: {
+    backgroundColor: '#52C41A', // green
   },
 });

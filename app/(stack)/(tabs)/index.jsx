@@ -204,6 +204,7 @@ const HomeScreen = () => {
                         <Text style={styles.tripDate}>
                           UGX {Number(trip.amountPerSeat).toLocaleString('en-us')}
                         </Text>
+                        <Text style={styles.tripDate}>{trip.registration}</Text>
                       </View>
                     </Pressable>
                   ))
