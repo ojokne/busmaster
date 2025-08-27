@@ -81,7 +81,7 @@ export default function BusLayoutScreen() {
       <StatusBar style="dark" />
 
       <BusLayout
-        totalSeats={53}
+        totalSeats={trip.seatCapacity}
         bookedSeats={trip?.occupiedSeats || []}
         from={trip.from}
         to={trip.to}

@@ -8,13 +8,14 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useEffect, useState } from 'react';
-import Seat from './Seat';
 import { useRouter } from 'expo-router';
 import { AntDesign } from '@expo/vector-icons';
 import Colors from '../constants/colors';
 import { collection, doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { printSingleTicket } from '../utils';
+import ExecutiveBusLayout from './ExecutiveBusLayout';
+import StandardBusLayout from './StandardBusLayout';
 
 const BusLayout = ({ totalSeats, from, to, tripId, amountPerSeat }) => {
   const [selectedSeats, setSelectedSeats] = useState([]);
@@ -63,67 +64,6 @@ const BusLayout = ({ totalSeats, from, to, tripId, amountPerSeat }) => {
       },
     });
     console.log(selectedSeats);
-  };
-
-  const render52Seats = () => {
-    const seats = [];
-
-    for (let i = 1; i <= 52; i += 4) {
-      seats.push(
-        <View style={styles.row} key={i}>
-          <View style={styles.seatPair}>
-            <Seat
-              number={i}
-              currentStatus={
-                occupiedSeats.includes(i)
-                  ? 'occupied'
-                  : selectedSeats.includes(i)
-                    ? 'selected'
-                    : 'available'
-              }
-              onPress={() => toggleSeat(i)}
-            />
-            <Seat
-              number={i + 1}
-              currentStatus={
-                occupiedSeats.includes(i + 1)
-                  ? 'occupied'
-                  : selectedSeats.includes(i + 1)
-                    ? 'selected'
-                    : 'available'
-              }
-              onPress={() => toggleSeat(i + 1)}
-            />
-          </View>
-          <View style={styles.seatPair}>
-            <Seat
-              number={i + 2}
-              currentStatus={
-                occupiedSeats.includes(i + 2)
-                  ? 'occupied'
-                  : selectedSeats.includes(i + 2)
-                    ? 'selected'
-                    : 'available'
-              }
-              onPress={() => toggleSeat(i + 2)}
-            />
-            <Seat
-              number={i + 3}
-              currentStatus={
-                occupiedSeats.includes(i + 3)
-                  ? 'occupied'
-                  : selectedSeats.includes(i + 3)
-                    ? 'selected'
-                    : 'available'
-              }
-              onPress={() => toggleSeat(i + 3)}
-            />
-          </View>
-        </View>,
-      );
-    }
-
-    return seats;
   };
 
   const printTicket = async (fullName, phone, from, to, seat, amountPerSeat) => {
@@ -182,7 +122,21 @@ const BusLayout = ({ totalSeats, from, to, tripId, amountPerSeat }) => {
         </Pressable>
       </View>
       <View style={styles.bus}>
-        <ScrollView contentContainerStyle={styles.container}>{render52Seats()}</ScrollView>
+        <ScrollView contentContainerStyle={styles.container}>
+          {totalSeats > 57 ? (
+            <StandardBusLayout
+              selectedSeats={selectedSeats}
+              occupiedSeats={occupiedSeats}
+              onSeatPress={toggleSeat}
+            />
+          ) : (
+            <ExecutiveBusLayout
+              selectedSeats={selectedSeats}
+              occupiedSeats={occupiedSeats}
+              onSeatPress={toggleSeat}
+            />
+          )}
+        </ScrollView>
       </View>
       <View style={styles.legend}>
         <View style={styles.legendItem}>
