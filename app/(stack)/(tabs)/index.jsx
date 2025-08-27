@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { View, Text, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
-import { Feather, FontAwesome5, FontAwesome, AntDesign } from '@expo/vector-icons';
+import { Feather, FontAwesome5, FontAwesome, AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { useFocusEffect, useRouter } from 'expo-router';
 import Colors from '../../../constants/colors';
 import { collection, query, orderBy, limit, getDocs, where, Timestamp } from 'firebase/firestore';
@@ -165,6 +165,17 @@ const HomeScreen = () => {
             <Text style={styles.actionText}>Create Trip</Text>
           </Pressable>
         </View>
+        <View style={styles.actionsContainer}>
+          <Pressable style={styles.actionCard} onPress={handleSellTicket} testID="sell-ticket">
+            <MaterialIcons name="verified" size={24} color={Colors.primary} />
+            <Text style={styles.actionText}>Verify Ticket</Text>
+          </Pressable>
+
+          <Pressable style={styles.actionCard} onPress={handleCreateTrip} testID="create-trip">
+            <Feather name="package" size={28} color={Colors.primary} />
+            <Text style={styles.actionText}>Packages</Text>
+          </Pressable>
+        </View>
 
         <View>
           <Text style={styles.sectionTitle} testID="recent-trips">
@@ -183,20 +194,24 @@ const HomeScreen = () => {
                       key={trip.id}
                       style={styles.tripItem}
                       onPress={() => router.push(`sell-ticket/bus-layout/${trip.id}`)}>
-                      <View>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                          width: '100%',
+                        }}>
                         <Text style={styles.tripName}>
                           {trip.from} <AntDesign name="arrowright" /> {trip.to}
                         </Text>
                         <Text style={styles.tripDate}>
-                          <AntDesign name="calendar" />{' '}
-                          {format(trip.startDateTime.toDate(), 'yyyy-MM-dd')}
+                          {format(trip.startDateTime.toDate(), 'eeee dd LLL yyyy')}
                         </Text>
-                        <Text style={styles.tripDate}>
+                        {/* <Text style={styles.tripDate}>
                           <AntDesign name="clockcircleo" />{' '}
                           {format(trip.startDateTime.toDate(), 'hh:mm a')}
-                        </Text>
+                        </Text> */}
                       </View>
-                      <View>
+                      {/* <View>
                         <View style={{ flexDirection: 'row' }}>
                           <Text style={styles.tickets}>Seats booked:</Text>
                           <Text style={styles.ticketSold}>{trip.occupiedSeats?.length || 0}</Text>
@@ -205,7 +220,7 @@ const HomeScreen = () => {
                           UGX {Number(trip.amountPerSeat).toLocaleString('en-us')}
                         </Text>
                         <Text style={styles.tripDate}>{trip.registration}</Text>
-                      </View>
+                      </View> */}
                     </Pressable>
                   ))
                 )}

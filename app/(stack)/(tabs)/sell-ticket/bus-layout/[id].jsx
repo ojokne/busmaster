@@ -82,9 +82,9 @@ export default function BusLayoutScreen() {
 
       <BusLayout
         totalSeats={trip.seatCapacity}
-        bookedSeats={trip?.occupiedSeats || []}
         from={trip.from}
         to={trip.to}
+        startDateTime={trip.startDateTime.toDate()}
         tripId={id}
         amountPerSeat={trip.amountPerSeat}
       />

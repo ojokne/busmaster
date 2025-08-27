@@ -17,7 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { printTicket } from '../../../../utils';
 
 export default function CheckoutScreen() {
-  const { seats, from, to, amountPerSeat, tripId } = useLocalSearchParams();
+  const { seats, from, to, startDateTime, amountPerSeat, tripId } = useLocalSearchParams();
   const parsedSeats = seats ? JSON.parse(seats) : [];
 
   const pricePerSeat = amountPerSeat ? parseFloat(amountPerSeat) : 0;
@@ -44,7 +44,7 @@ export default function CheckoutScreen() {
       const bookingsCol = collection(tripRef, 'bookings');
 
       if (userId !== null) {
-        await addDoc(bookingsCol, {
+        const bookingRef = await addDoc(bookingsCol, {
           createdBy: userId,
           selectedSeats: parsedSeats,
           passengerDetails: {
@@ -61,10 +61,13 @@ export default function CheckoutScreen() {
         });
 
         await printTicket({
+          tripId,
+          bookingId: bookingRef.id,
           fullName,
           phone,
           from,
           to,
+          startDateTime,
           seats: parsedSeats,
           totalPrice,
         });

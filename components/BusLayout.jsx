@@ -17,7 +17,7 @@ import { printSingleTicket } from '../utils';
 import ExecutiveBusLayout from './ExecutiveBusLayout';
 import StandardBusLayout from './StandardBusLayout';
 
-const BusLayout = ({ totalSeats, from, to, tripId, amountPerSeat }) => {
+const BusLayout = ({ totalSeats, from, to, startDateTime, tripId, amountPerSeat }) => {
   const [selectedSeats, setSelectedSeats] = useState([]);
   const router = useRouter();
   const [modalVisible, setModalVisible] = useState(false);
@@ -45,6 +45,7 @@ const BusLayout = ({ totalSeats, from, to, tripId, amountPerSeat }) => {
       setPassengerInfo({
         seat: seatNumber,
         ...match.passengerDetails,
+        bookingId: match.id,
       });
       setModalVisible(true);
     } else {
@@ -59,6 +60,7 @@ const BusLayout = ({ totalSeats, from, to, tripId, amountPerSeat }) => {
         seats: JSON.stringify(selectedSeats),
         from,
         to,
+        startDateTime,
         amountPerSeat,
         tripId,
       },
@@ -66,8 +68,28 @@ const BusLayout = ({ totalSeats, from, to, tripId, amountPerSeat }) => {
     console.log(selectedSeats);
   };
 
-  const printTicket = async (fullName, phone, from, to, seat, amountPerSeat) => {
-    await printSingleTicket(fullName, phone, from, to, seat, amountPerSeat);
+  const printTicket = async (
+    tripId,
+    bookingId,
+    fullName,
+    phone,
+    from,
+    to,
+    startDateTime,
+    seat,
+    amountPerSeat,
+  ) => {
+    await printSingleTicket(
+      tripId,
+      bookingId,
+      fullName,
+      phone,
+      from,
+      to,
+      startDateTime,
+      seat,
+      amountPerSeat,
+    );
   };
   useEffect(() => {
     const tripRef = doc(db, 'trips', tripId);
@@ -185,10 +207,13 @@ const BusLayout = ({ totalSeats, from, to, tripId, amountPerSeat }) => {
                 style={styles.button}
                 onPress={() =>
                   printTicket(
+                    tripId,
+                    passengerInfo?.bookingId,
                     passengerInfo?.fullName,
                     passengerInfo?.phone,
                     from,
                     to,
+                    startDateTime,
                     passengerInfo?.seat,
                     amountPerSeat,
                   )

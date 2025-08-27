@@ -1,3 +1,4 @@
+import { format } from 'date-fns';
 import { Alert, Linking, PermissionsAndroid, Platform } from 'react-native';
 import { BluetoothStateManager } from 'react-native-bluetooth-state-manager';
 import { BLEPrinter } from 'react-native-thermal-receipt-printer';
@@ -161,7 +162,17 @@ export const connectToPrinter = async (printer) => {
   }
 };
 
-export const printTicket = async ({ fullName, phone, from, to, seats, totalPrice }) => {
+export const printTicket = async ({
+  tripId,
+  bookingId,
+  fullName,
+  phone,
+  from,
+  to,
+  startDateTime,
+  seats,
+  totalPrice,
+}) => {
   try {
     const ESC = '\x1B';
     const GS = '\x1D';
@@ -171,10 +182,12 @@ export const printTicket = async ({ fullName, phone, from, to, seats, totalPrice
     const BOLD_OFF = ESC + 'E' + '\x00';
     const LINE = '------------------------------';
 
+    const travelDate = format(startDateTime, 'eee dd LLL yyyy');
+    const travelTime = format(startDateTime, 'hh:mm a');
     const date = new Date().toLocaleDateString();
     const time = new Date().toLocaleTimeString();
     const seatList = seats.join(', ');
-    const qrData = `Ticket: ${fullName}-${seatList}`;
+    const qrData = `busmaster://verify-ticket?tripId=${tripId}&bookingId=${bookingId}`;
 
     const storeLen = qrData.length + 3;
     const pL = String.fromCharCode(storeLen % 256);
@@ -229,14 +242,17 @@ export const printTicket = async ({ fullName, phone, from, to, seats, totalPrice
       LEFT +
       `Total: UGX ${totalPrice.toLocaleString()}\n` +
       LEFT +
-      `Date: ${date} ${time}\n` +
+      `Date: ${travelDate} ${travelTime}\n` +
       CENTER +
       LINE +
       '\n' +
       qrCode +
       '\n' +
       CENTER +
-      'Thank you & safe travels!\n\n\n';
+      'Thank you & safe travels!' +
+      '\n' +
+      CENTER +
+      `Printed on: ${date} ${time}\n`;
 
     await BLEPrinter.printBill(receipt);
   } catch (error) {
@@ -245,7 +261,17 @@ export const printTicket = async ({ fullName, phone, from, to, seats, totalPrice
   }
 };
 
-export const printSingleTicket = async (fullName, phone, from, to, seat, amountPerSeat) => {
+export const printSingleTicket = async (
+  tripId,
+  bookingId,
+  fullName,
+  phone,
+  from,
+  to,
+  startDateTime,
+  seat,
+  amountPerSeat,
+) => {
   try {
     const ESC = '\x1B';
     const GS = '\x1D';
@@ -255,9 +281,11 @@ export const printSingleTicket = async (fullName, phone, from, to, seat, amountP
     const BOLD_OFF = ESC + 'E' + '\x00';
     const LINE = '------------------------------';
 
+    const travelDate = format(startDateTime, 'eee dd LLL yyyy');
+    const travelTime = format(startDateTime, 'hh:mm a');
     const date = new Date().toLocaleDateString();
     const time = new Date().toLocaleTimeString();
-    const qrData = `Ticket: ${fullName}-${seat}`;
+    const qrData = `busmaster://verify-ticket?tripId=${tripId}&bookingId=${bookingId}`;
 
     const storeLen = qrData.length + 3;
     const pL = String.fromCharCode(storeLen % 256);
@@ -312,14 +340,17 @@ export const printSingleTicket = async (fullName, phone, from, to, seat, amountP
       LEFT +
       `Total: UGX ${amountPerSeat.toLocaleString()}\n` +
       LEFT +
-      `Date: ${date} ${time}\n` +
+      `Date: ${travelDate} ${travelTime}\n` +
       CENTER +
       LINE +
       '\n' +
       qrCode +
       '\n' +
       CENTER +
-      'Thank you & safe travels!\n\n\n';
+      'Thank you & safe travels!' +
+      '\n' +
+      CENTER +
+      `Printed on: ${date} ${time}\n`;
 
     await BLEPrinter.printBill(receipt);
   } catch (error) {

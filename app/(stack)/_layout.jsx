@@ -14,6 +14,10 @@ export default function Layout() {
         name="create-trip"
         options={{ headerShadowVisible: false, title: 'Create Trip' }}
       />
+      <Stack.Screen
+        name="verify-ticket"
+        options={{ headerShadowVisible: false, title: 'Ticket Verification' }}
+      />
     </Stack>
   );
 }
