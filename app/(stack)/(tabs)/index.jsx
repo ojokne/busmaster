@@ -25,6 +25,14 @@ const HomeScreen = () => {
     router.push('/sell-ticket');
   };
 
+  const handleVerifyTicket = () => {
+    router.push('scan-qrcode');
+  };
+
+  const handlePackages = () => {
+    router.push('packages');
+  };
+
   useFocusEffect(
     useCallback(() => {
       const fetchTrips = async () => {
@@ -166,12 +174,12 @@ const HomeScreen = () => {
           </Pressable>
         </View>
         <View style={styles.actionsContainer}>
-          <Pressable style={styles.actionCard} onPress={handleSellTicket} testID="sell-ticket">
+          <Pressable style={styles.actionCard} onPress={handleVerifyTicket} testID="sell-ticket">
             <MaterialIcons name="verified" size={24} color={Colors.primary} />
             <Text style={styles.actionText}>Verify Ticket</Text>
           </Pressable>
 
-          <Pressable style={styles.actionCard} onPress={handleCreateTrip} testID="create-trip">
+          <Pressable style={styles.actionCard} onPress={handlePackages} testID="create-trip">
             <Feather name="package" size={28} color={Colors.primary} />
             <Text style={styles.actionText}>Packages</Text>
           </Pressable>
@@ -204,7 +212,7 @@ const HomeScreen = () => {
                           {trip.from} <AntDesign name="arrowright" /> {trip.to}
                         </Text>
                         <Text style={styles.tripDate}>
-                          {format(trip.startDateTime.toDate(), 'eeee dd LLL yyyy')}
+                          {format(trip.startDateTime.toDate(), 'eee dd LLL yyyy')}
                         </Text>
                         {/* <Text style={styles.tripDate}>
                           <AntDesign name="clockcircleo" />{' '}

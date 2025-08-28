@@ -252,7 +252,7 @@ export const printTicket = async ({
       'Thank you & safe travels!' +
       '\n' +
       CENTER +
-      `Printed on: ${date} ${time}\n`;
+      `Printed on: ${date} ${time}`;
 
     await BLEPrinter.printBill(receipt);
   } catch (error) {
@@ -350,7 +350,7 @@ export const printSingleTicket = async (
       'Thank you & safe travels!' +
       '\n' +
       CENTER +
-      `Printed on: ${date} ${time}\n`;
+      `Printed on: ${date} ${time}`;
 
     await BLEPrinter.printBill(receipt);
   } catch (error) {
